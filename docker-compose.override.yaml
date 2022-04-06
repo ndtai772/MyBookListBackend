@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8
+    container_name: db
+    cap_add:
+      - SYS_NICE
+    environment:
+      - MYSQL_INITDB_SKIP_TZINFO=1
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=MyBookList
+      - MYSQL_USER=dev
+      - MYSQL_PASSWORD=123
+    ports:
+      - "3307:3306"
+    # volumes:
+    #   - ./db/init:/docker-entrypoint-initdb.d
