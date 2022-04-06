@@ -1,18 +1,27 @@
 version: "3.8"
 
 services:
+  # db:
+  #   image: mysql:8
+  #   container_name: db
+  #   cap_add:
+  #     - SYS_NICE
+  #   environment:
+  #     - MYSQL_INITDB_SKIP_TZINFO=1
+  #     - MYSQL_ROOT_PASSWORD=root
+  #     - MYSQL_DATABASE=MyBookList
+  #     - MYSQL_USER=dev
+  #     - MYSQL_PASSWORD=123
+  #   ports:
+  #     - "3307:3306"
+  #   volumes:
+  #     - ./db/init:/docker-entrypoint-initdb.d
+
   db:
-    image: mysql:8
-    container_name: db
-    cap_add:
-      - SYS_NICE
+    image: postgres:14-alpine
     environment:
-      - MYSQL_INITDB_SKIP_TZINFO=1
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=MyBookList
-      - MYSQL_USER=dev
-      - MYSQL_PASSWORD=123
+      - POSTGRES_USER=dev
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=my_bbok_list
     ports:
-      - "3307:3306"
-    # volumes:
-    #   - ./db/init:/docker-entrypoint-initdb.d
+      - "5433:5432"
