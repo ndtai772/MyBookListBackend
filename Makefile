@@ -1,5 +1,9 @@
-DB_URL=mysql://dev:123@tcp(127.0.0.1:3307)/MyBookList
+DB_URL=postgresql://dev:123@localhost:5433/my_book_list?sslmode=disable
 MIGRATE=./bin/migrate/migrate
+
+up:
+	docker-compose up
+	docker exec backend-db-1 createdb --username=dev --owner=dev my_book_list
 
 migrateup:
 	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose up
@@ -12,8 +16,3 @@ migratedown:
 
 migratedown1:
 	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose down 1
-
-getgomigrate:
-	mkdir -p ./bin/migrate
-	curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.1/migrate.linux-amd64.tar.gz | tar -xvz -C ./bin/migrate
-	chmod u+x ./bin/migrate/migrate
