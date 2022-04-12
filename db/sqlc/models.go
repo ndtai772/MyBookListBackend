@@ -4,57 +4,17 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 )
-
-type AccountRoles string
-
-const (
-	AccountRolesAdmin AccountRoles = "admin"
-	AccountRolesUser  AccountRoles = "user"
-)
-
-func (e *AccountRoles) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = AccountRoles(s)
-	case string:
-		*e = AccountRoles(s)
-	default:
-		return fmt.Errorf("unsupported scan type for AccountRoles: %T", src)
-	}
-	return nil
-}
-
-type FeedbackStatus string
-
-const (
-	FeedbackStatusProcessing  FeedbackStatus = "processing"
-	FeedbackStatusResolved    FeedbackStatus = "resolved"
-	FeedbackStatusNotResolved FeedbackStatus = "not_resolved"
-)
-
-func (e *FeedbackStatus) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = FeedbackStatus(s)
-	case string:
-		*e = FeedbackStatus(s)
-	default:
-		return fmt.Errorf("unsupported scan type for FeedbackStatus: %T", src)
-	}
-	return nil
-}
 
 type Account struct {
-	ID          int64
+	ID          int32
 	Username    string
 	Email       string
+	EncodedHash string
 	AvatarUri   sql.NullString
-	Role        AccountRoles
+	IsAdmin     bool
 	ModifiedAt  sql.NullTime
 	CreatedAt   sql.NullTime
-	EncodedHash string
 }
 
 type Book struct {
@@ -73,9 +33,9 @@ type BookCategory struct {
 }
 
 type Bookmark struct {
-	ID        int64
+	ID        int32
 	BookID    int32
-	AccountID int64
+	CreatedBy int32
 	CreatedAt sql.NullTime
 }
 
@@ -88,28 +48,31 @@ type Category struct {
 }
 
 type Comment struct {
-	ID         int64
+	ID         int32
 	Content    string
 	BookID     int32
-	CreatedBy  int64
+	CreatedBy  int32
 	ModifiedAt sql.NullTime
 	CreatedAt  sql.NullTime
 }
 
 type Feedback struct {
-	ID         int64
-	Content    string
-	CreatedBy  int64
-	Message    sql.NullString
-	Status     FeedbackStatus
-	ModifiedAt sql.NullTime
-	CreatedAt  sql.NullTime
+	ID           int32
+	Content      string
+	CreatedBy    int32
+	IsViewed     bool
+	IsProcessing bool
+	IsResolved   bool
+	Message      sql.NullString
+	ModifiedAt   sql.NullTime
+	CreatedAt    sql.NullTime
 }
 
 type Rate struct {
-	ID         int64
+	ID         int32
 	BookID     int32
-	AccountID  int64
+	CreatedBy  int32
+	RateValue  int32
 	ModifiedAt sql.NullTime
 	CreatedAt  sql.NullTime
 }

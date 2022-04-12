@@ -1,21 +1,11 @@
-CREATE TYPE "account_roles" AS ENUM (
-  'admin',
-  'user'
-);
-
-CREATE TYPE "feedback_status" AS ENUM (
-  'processing',
-  'resolved',
-  'not_resolved'
-);
-
 CREATE TABLE "accounts" (
-  "id" BIGINT PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "username" VARCHAR(255) UNIQUE NOT NULL,
   "email" VARCHAR(255) UNIQUE NOT NULL,
+  "encoded_hash" VARCHAR(255) NOT NULL,
   "avatar_uri" VARCHAR(255),
-  "role" account_roles NOT NULL DEFAULT 'user',
-  "modified_at" TIMESTAMP,
+  "is_admin" boolean NOT NULL DEFAULT false,
+  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
@@ -24,7 +14,7 @@ CREATE TABLE "books" (
   "title" VARCHAR(255) NOT NULL,
   "author" VARCHAR(255) NOT NULL,
   "description" VARCHAR(10000) NOT NULL,
-  "modified_at" TIMESTAMP,
+  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
@@ -32,7 +22,7 @@ CREATE TABLE "categories" (
   "id" SERIAL PRIMARY KEY,
   "name" VARCHAR(255) NOT NULL,
   "description" VARCHAR(10000),
-  "modified_at" TIMESTAMP,
+  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
@@ -43,36 +33,39 @@ CREATE TABLE "book_category" (
 );
 
 CREATE TABLE "bookmarks" (
-  "id" BIGINT PRIMARY KEY,
+  "id" INT PRIMARY KEY,
   "book_id" INT NOT NULL,
-  "account_id" BIGINT NOT NULL,
+  "created_by" INT NOT NULL,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "rates" (
-  "id" BIGINT PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "book_id" INT NOT NULL,
-  "account_id" BIGINT NOT NULL,
-  "modified_at" TIMESTAMP,
+  "created_by" INT NOT NULL,
+  "rate_value" INT NOT NULL,
+  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "comments" (
-  "id" BIGINT PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "content" VARCHAR(1000) NOT NULL,
   "book_id" INT NOT NULL,
-  "created_by" BIGINT NOT NULL,
-  "modified_at" TIMESTAMP,
+  "created_by" INT NOT NULL,
+  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "feedbacks" (
-  "id" BIGINT PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "content" VARCHAR(1000) NOT NULL,
-  "created_by" BIGINT NOT NULL,
+  "created_by" INT NOT NULL,
+  "is_viewed" boolean NOT NULL DEFAULT false,
+  "is_processing" boolean NOT NULL DEFAULT false,
+  "is_resolved" boolean NOT NULL DEFAULT false,
   "message" VARCHAR(1000),
-  "status" feedback_status NOT NULL,
-  "modified_at" timestamp,
+  "modified_at" timestamp DEFAULT (CURRENT_TIMESTAMP),
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
@@ -82,11 +75,11 @@ ALTER TABLE "book_category" ADD FOREIGN KEY ("category_id") REFERENCES "categori
 
 ALTER TABLE "bookmarks" ADD FOREIGN KEY ("book_id") REFERENCES "books" ("id");
 
-ALTER TABLE "bookmarks" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id");
+ALTER TABLE "bookmarks" ADD FOREIGN KEY ("created_by") REFERENCES "accounts" ("id");
 
 ALTER TABLE "rates" ADD FOREIGN KEY ("book_id") REFERENCES "books" ("id");
 
-ALTER TABLE "rates" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id");
+ALTER TABLE "rates" ADD FOREIGN KEY ("created_by") REFERENCES "accounts" ("id");
 
 ALTER TABLE "comments" ADD FOREIGN KEY ("book_id") REFERENCES "books" ("id");
 
@@ -112,10 +105,12 @@ CREATE UNIQUE INDEX ON "book_category" ("book_id", "category_id");
 
 CREATE INDEX ON "bookmarks" ("book_id");
 
-CREATE INDEX ON "bookmarks" ("account_id");
+CREATE INDEX ON "bookmarks" ("created_by");
 
-CREATE UNIQUE INDEX ON "bookmarks" ("book_id", "account_id");
+CREATE UNIQUE INDEX ON "bookmarks" ("book_id", "created_by");
 
 CREATE INDEX ON "comments" ("book_id");
 
 CREATE INDEX ON "comments" ("created_by");
+
+CREATE INDEX ON "feedbacks" ("created_by");
