@@ -47,13 +47,14 @@ func (e *FeedbackStatus) Scan(src interface{}) error {
 }
 
 type Account struct {
-	ID         int64
-	Username   string
-	Email      string
-	AvatarUri  sql.NullString
-	Role       AccountRoles
-	ModifiedAt sql.NullTime
-	CreatedAt  sql.NullTime
+	ID          int64
+	Username    string
+	Email       string
+	AvatarUri   sql.NullString
+	Role        AccountRoles
+	ModifiedAt  sql.NullTime
+	CreatedAt   sql.NullTime
+	EncodedHash string
 }
 
 type Book struct {

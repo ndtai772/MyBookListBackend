@@ -1,0 +1,1 @@
+ALTER TABLE accounts ADD COLUMN encoded_hash VARCHAR NOT NULL;
