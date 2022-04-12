@@ -12,17 +12,17 @@ INSERT INTO accounts (
     id,
     username,
     email,
-    role
+    is_admin
 ) VALUES (
     $1, $2, $3, $4
-) RETURNING id, username, email, avatar_uri, role, modified_at, created_at
+) RETURNING id, username, email, encoded_hash, avatar_uri, is_admin, modified_at, created_at
 `
 
 type CreateAccountParams struct {
-	ID       int64
+	ID       int32
 	Username string
 	Email    string
-	Role     AccountRoles
+	IsAdmin  bool
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error) {
@@ -30,15 +30,16 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (A
 		arg.ID,
 		arg.Username,
 		arg.Email,
-		arg.Role,
+		arg.IsAdmin,
 	)
 	var i Account
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
 		&i.Email,
+		&i.EncodedHash,
 		&i.AvatarUri,
-		&i.Role,
+		&i.IsAdmin,
 		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
@@ -46,20 +47,21 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (A
 }
 
 const getAccount = `-- name: GetAccount :one
-SELECT id, username, email, avatar_uri, role, modified_at, created_at
+SELECT id, username, email, encoded_hash, avatar_uri, is_admin, modified_at, created_at
 FROM accounts
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetAccount(ctx context.Context, id int64) (Account, error) {
+func (q *Queries) GetAccount(ctx context.Context, id int32) (Account, error) {
 	row := q.db.QueryRowContext(ctx, getAccount, id)
 	var i Account
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
 		&i.Email,
+		&i.EncodedHash,
 		&i.AvatarUri,
-		&i.Role,
+		&i.IsAdmin,
 		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
@@ -67,7 +69,7 @@ func (q *Queries) GetAccount(ctx context.Context, id int64) (Account, error) {
 }
 
 const listAccounts = `-- name: ListAccounts :many
-SELECT id, username, email, avatar_uri, role, modified_at, created_at
+SELECT id, username, email, encoded_hash, avatar_uri, is_admin, modified_at, created_at
 FROM accounts
 LIMIT $1
 OFFSET $2
@@ -91,8 +93,9 @@ func (q *Queries) ListAccounts(ctx context.Context, arg ListAccountsParams) ([]A
 			&i.ID,
 			&i.Username,
 			&i.Email,
+			&i.EncodedHash,
 			&i.AvatarUri,
-			&i.Role,
+			&i.IsAdmin,
 			&i.ModifiedAt,
 			&i.CreatedAt,
 		); err != nil {
@@ -107,4 +110,32 @@ func (q *Queries) ListAccounts(ctx context.Context, arg ListAccountsParams) ([]A
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateAccount = `-- name: UpdateAccount :one
+UPDATE accounts
+SET encoded_hash = $2
+WHERE id = $1
+RETURNING id, username, email, encoded_hash, avatar_uri, is_admin, modified_at, created_at
+`
+
+type UpdateAccountParams struct {
+	ID          int32
+	EncodedHash string
+}
+
+func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error) {
+	row := q.db.QueryRowContext(ctx, updateAccount, arg.ID, arg.EncodedHash)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.EncodedHash,
+		&i.AvatarUri,
+		&i.IsAdmin,
+		&i.ModifiedAt,
+		&i.CreatedAt,
+	)
+	return i, err
 }

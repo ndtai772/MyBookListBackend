@@ -3,7 +3,7 @@ INSERT INTO accounts (
     id,
     username,
     email,
-    role
+    is_admin
 ) VALUES (
     $1, $2, $3, $4
 ) RETURNING *;
@@ -18,3 +18,9 @@ SELECT *
 FROM accounts
 LIMIT $1
 OFFSET $2;
+
+-- name: UpdateAccount :one
+UPDATE accounts
+SET encoded_hash = $2
+WHERE id = $1
+RETURNING *;
