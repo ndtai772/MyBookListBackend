@@ -67,6 +67,7 @@ const listBookmarksByAccountId = `-- name: ListBookmarksByAccountId :many
 SELECT id, book_id, created_by, created_at
 FROM bookmarks
 WHERE created_by = $3
+ORDER BY id DESC
 LIMIT $1
 OFFSET $2
 `

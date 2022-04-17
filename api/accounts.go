@@ -78,7 +78,10 @@ func (server *Server) listPersonalBookmarks(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, bookmarks)
+	ctx.JSON(http.StatusOK, gin.H {
+		"data": bookmarks,
+		"next_index": offset + int32(len(bookmarks)),
+	})
 }
 
 func (server *Server) listPersonalRates(ctx * gin.Context) {
@@ -93,7 +96,7 @@ func (server *Server) listPersonalRates(ctx * gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 	}
 
-	bookmarks, err := server.store.ListRatesByAccountId(ctx, db.ListRatesByAccountIdParams{
+	rates, err := server.store.ListRatesByAccountId(ctx, db.ListRatesByAccountIdParams{
 		Limit:     limit,
 		Offset:    offset,
 		CreatedBy: id,
@@ -104,5 +107,8 @@ func (server *Server) listPersonalRates(ctx * gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, bookmarks)
+	ctx.JSON(http.StatusOK, gin.H {
+		"data": rates,
+		"next_index": offset + int32(len(rates)),
+	})
 }

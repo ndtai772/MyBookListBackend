@@ -19,5 +19,6 @@ WHERE id = $1;
 SELECT *
 FROM bookmarks
 WHERE created_by = $3
+ORDER BY id DESC
 LIMIT $1
 OFFSET $2;
