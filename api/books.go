@@ -61,7 +61,7 @@ func (server *Server) createBook(ctx *gin.Context) {
 	// TODO: bad practice
 	for i := 0; i < len(createBookRequest.Categories); i++ {
 		params := db.CreateBookCategoryParams{
-			BookID: book.ID,
+			BookID:     book.ID,
 			CategoryID: createBookRequest.Categories[i],
 		}
 
@@ -72,5 +72,22 @@ func (server *Server) createBook(ctx *gin.Context) {
 		}
 	}
 
-	
+	ctx.JSON(http.StatusOK, book)
+}
+
+func (server *Server) getBook(ctx *gin.Context) {
+	id, err := parseIdUri(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	book, err := server.store.GetBook(ctx, id)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, book)
 }
