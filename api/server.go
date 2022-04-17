@@ -43,7 +43,7 @@ func (server *Server) setupRouter() {
 
 	// Books
 	publicRoutes.GET("/books", server.listBooks)
-	authRoutes.POST("/books", unimplemented("create book"))
+	authRoutes.POST("/books", server.createBook)
 	authRoutes.GET("/books/:id", unimplemented("get book by id"))
 	authRoutes.PATCH("/books/:id", unimplemented("update book info"))
 	authRoutes.DELETE("/books/:id", unimplemented("delete a book"))

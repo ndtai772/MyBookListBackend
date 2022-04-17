@@ -14,8 +14,8 @@ func parseIdUri(ctx *gin.Context) (int32, error) {
 
 func parsePaginateQuery(ctx *gin.Context) (int32, int32, error) {
 	var paginateQuery struct {
-		Limit  int32 `query:"limit" binding:"min=1"`
-		Offset int32 `query:"limit" binding:"min=0"`
+		Limit  int32 `form:"limit" binding:"min=1"`
+		Offset int32 `form:"limit" binding:"min=0"`
 	}
 
 	err := ctx.ShouldBindQuery(&paginateQuery)

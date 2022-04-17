@@ -15,6 +15,7 @@ WHERE id = $1 LIMIT 1;
 -- name: ListBooks :many
 SELECT *
 FROM books
+ORDER BY id DESC
 LIMIT $1
 OFFSET $2;
 
