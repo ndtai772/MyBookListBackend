@@ -28,21 +28,21 @@ func (server *Server) setupRouter() {
 	// Accounts
 	publicRoutes.POST("/accounts", server.createAccount)
 	publicRoutes.GET("/accounts/:id", server.getAccount)
-	authRoutes.PATCH("/accounts/:id", unimplemented("update account info"))
-	authRoutes.DELETE("/accounts/:id", unimplemented("inactive account"))
-	authRoutes.GET("/accounts/:id/feedbacks", unimplemented("get personal feedbacks"))
-	authRoutes.GET("/accounts/:id/bookmarks", unimplemented("get personal bookmarks"))
-	authRoutes.GET("/accounts/:id/rates", unimplemented("get personal rates"))
+	// authRoutes.PATCH("/accounts/:id", unimplemented("update account info"))
+	// authRoutes.DELETE("/accounts/:id", unimplemented("inactive account"))
+	// authRoutes.GET("/accounts/:id/feedbacks", unimplemented("get personal feedbacks"))
+	authRoutes.GET("/accounts/:id/bookmarks", server.listPersonalBookmarks)
+	authRoutes.GET("/accounts/:id/rates", server.listPersonalRates)
 
-	// Feedbacks
-	authRoutes.GET("/feedbacks", unimplemented("list all user feedbacks"))
-	authRoutes.POST("/feedbacks", unimplemented("create feedback"))
-	authRoutes.GET("/feedbacks/:id", unimplemented("get feedback by id"))
-	authRoutes.PATCH("/feedbacks/:id", unimplemented("update feedback"))
-	authRoutes.DELETE("/feedbacks/:id", unimplemented("delete a feedback"))
+	// // Feedbacks
+	// authRoutes.GET("/feedbacks", unimplemented("list all user feedbacks"))
+	// authRoutes.POST("/feedbacks", unimplemented("create feedback"))
+	// authRoutes.GET("/feedbacks/:id", unimplemented("get feedback by id"))
+	// authRoutes.PATCH("/feedbacks/:id", unimplemented("update feedback"))
+	// authRoutes.DELETE("/feedbacks/:id", unimplemented("delete a feedback"))
 
 	// Books
-	authRoutes.GET("/books", unimplemented("list books"))
+	publicRoutes.GET("/books", server.listBooks)
 	authRoutes.POST("/books", unimplemented("create book"))
 	authRoutes.GET("/books/:id", unimplemented("get book by id"))
 	authRoutes.PATCH("/books/:id", unimplemented("update book info"))
@@ -73,10 +73,6 @@ func (server *Server) setupRouter() {
 	authRoutes.DELETE("/comments/:id", unimplemented("delete a rate"))
 
 	server.router = router
-}
-
-func errorResponse(err error) gin.H {
-	return gin.H{"error": err.Error()}
 }
 
 func unimplemented(msg string) func(ctx *gin.Context) {

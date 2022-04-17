@@ -12,7 +12,7 @@ import (
 const (
 	dbDriver = "postgres"
 	dbSource = "postgresql://dev:123@localhost:5432/my_book_list?sslmode=disable"
-	serverAddress = "0.0.0.0:3000"
+	serverAddress = "0.0.0.0:8080"
 )
 
 func main() {

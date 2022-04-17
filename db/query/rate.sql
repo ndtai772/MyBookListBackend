@@ -22,3 +22,10 @@ RETURNING *;
 -- name: DeleteRate :exec
 DELETE FROM rates
 WHERE id = $1;
+
+-- name: ListRatesByAccountId :many
+SELECT *
+FROM rates
+WHERE created_by = $3
+LIMIT $1
+OFFSET $2;

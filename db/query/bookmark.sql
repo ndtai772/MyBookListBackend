@@ -14,3 +14,10 @@ WHERE id = $1 LIMIT 1;
 -- name: DeleteBookmark :exec
 DELETE FROM bookmarks
 WHERE id = $1;
+
+-- name: ListBookmarksByAccountId :many
+SELECT *
+FROM bookmarks
+WHERE created_by = $3
+LIMIT $1
+OFFSET $2;

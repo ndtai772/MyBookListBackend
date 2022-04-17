@@ -87,7 +87,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Book
+	items := []Book{}
 	for rows.Next() {
 		var i Book
 		if err := rows.Scan(

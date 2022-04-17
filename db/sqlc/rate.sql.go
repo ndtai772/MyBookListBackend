@@ -70,6 +70,50 @@ func (q *Queries) GetRate(ctx context.Context, id int32) (Rate, error) {
 	return i, err
 }
 
+const listRatesByAccountId = `-- name: ListRatesByAccountId :many
+SELECT id, book_id, created_by, rate_value, modified_at, created_at
+FROM rates
+WHERE created_by = $3
+LIMIT $1
+OFFSET $2
+`
+
+type ListRatesByAccountIdParams struct {
+	Limit     int32 `json:"limit"`
+	Offset    int32 `json:"offset"`
+	CreatedBy int32 `json:"created_by"`
+}
+
+func (q *Queries) ListRatesByAccountId(ctx context.Context, arg ListRatesByAccountIdParams) ([]Rate, error) {
+	rows, err := q.db.QueryContext(ctx, listRatesByAccountId, arg.Limit, arg.Offset, arg.CreatedBy)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Rate{}
+	for rows.Next() {
+		var i Rate
+		if err := rows.Scan(
+			&i.ID,
+			&i.BookID,
+			&i.CreatedBy,
+			&i.RateValue,
+			&i.ModifiedAt,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateRate = `-- name: UpdateRate :one
 UPDATE rates
 SET rate_value = $2

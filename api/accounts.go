@@ -8,24 +8,22 @@ import (
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
 )
 
-
 func (server *Server) createAccount(ctx *gin.Context) {
-	type createAccountRequest struct {
+	var createAccountRequest struct {
 		Username string `form:"username" binding:"required,alphanum"`
 		Password string `form:"password" binding:"required,min=6"`
 		Email    string `form:"email" binding:"required,email"`
 	}
-	
-	var form createAccountRequest
-	if err := ctx.ShouldBindWith(&form, binding.Form); err != nil {
+
+	if err := ctx.ShouldBindWith(&createAccountRequest, binding.Form); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
 	arg := db.CreateAccountParams{
-		Username:    form.Username,
-		Email:       form.Email,
-		EncodedHash: form.Password,
+		Username:    createAccountRequest.Username,
+		Email:       createAccountRequest.Email,
+		EncodedHash: createAccountRequest.Password,
 		IsAdmin:     false,
 	}
 
@@ -39,13 +37,72 @@ func (server *Server) createAccount(ctx *gin.Context) {
 }
 
 func (server *Server) getAccount(ctx *gin.Context) {
-	ctx.JSON(http.StatusNotImplemented, gin.H{
-		"message": "unimplemented",
-	})
+	var getAccountRequest struct {
+		Id int32 `uri:"id" binding:"required,min=1"`
+	}
+
+	if err := ctx.ShouldBindUri(&getAccountRequest); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	account, err := server.store.GetAccount(ctx, getAccountRequest.Id)
+
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, account)
 }
 
-func (server *Server) searchAccount(ctx *gin.Context) {
-	ctx.JSON(http.StatusNotImplemented, gin.H{
-		"message": "unimplemented",
+func (server *Server) listPersonalBookmarks(ctx *gin.Context) {
+	id, err := parseIdUri(ctx)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	limit, offset, err := parsePaginateQuery(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	bookmarks, err := server.store.ListBookmarksByAccountId(ctx, db.ListBookmarksByAccountIdParams{
+		Limit:     limit,
+		Offset:    offset,
+		CreatedBy: id,
 	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, bookmarks)
+}
+
+func (server *Server) listPersonalRates(ctx * gin.Context) {
+	id, err := parseIdUri(ctx)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	limit, offset, err := parsePaginateQuery(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	bookmarks, err := server.store.ListRatesByAccountId(ctx, db.ListRatesByAccountIdParams{
+		Limit:     limit,
+		Offset:    offset,
+		CreatedBy: id,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, bookmarks)
 }

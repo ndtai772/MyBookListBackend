@@ -91,7 +91,7 @@ func (q *Queries) ListFeedbacks(ctx context.Context, arg ListFeedbacksParams) ([
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Feedback
+	items := []Feedback{}
 	for rows.Next() {
 		var i Feedback
 		if err := rows.Scan(

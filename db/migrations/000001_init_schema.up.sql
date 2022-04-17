@@ -3,10 +3,10 @@ CREATE TABLE "accounts" (
   "username" VARCHAR(255) UNIQUE NOT NULL,
   "email" VARCHAR(255) UNIQUE NOT NULL,
   "encoded_hash" VARCHAR(255) NOT NULL,
-  "avatar_uri" VARCHAR(255),
+  "avatar_uri" VARCHAR(255) NOT NULL DEFAULT (`/asserts/images/deafault_avatar.jpeg`),
   "is_admin" boolean NOT NULL DEFAULT false,
-  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
-  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  "modified_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "books" (
@@ -14,29 +14,29 @@ CREATE TABLE "books" (
   "title" VARCHAR(255) NOT NULL,
   "author" VARCHAR(255) NOT NULL,
   "description" VARCHAR(10000) NOT NULL,
-  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
-  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  "modified_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "categories" (
   "id" SERIAL PRIMARY KEY,
   "name" VARCHAR(255) NOT NULL,
   "description" VARCHAR(10000),
-  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
-  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  "modified_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "book_category" (
   "book_id" INT NOT NULL,
   "category_id" INT NOT NULL,
-  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "bookmarks" (
   "id" INT PRIMARY KEY,
   "book_id" INT NOT NULL,
   "created_by" INT NOT NULL,
-  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "rates" (
@@ -44,8 +44,8 @@ CREATE TABLE "rates" (
   "book_id" INT NOT NULL,
   "created_by" INT NOT NULL,
   "rate_value" INT NOT NULL,
-  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
-  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  "modified_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "comments" (
@@ -53,8 +53,8 @@ CREATE TABLE "comments" (
   "content" VARCHAR(1000) NOT NULL,
   "book_id" INT NOT NULL,
   "created_by" INT NOT NULL,
-  "modified_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
-  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  "modified_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE "feedbacks" (
@@ -65,8 +65,8 @@ CREATE TABLE "feedbacks" (
   "is_processing" boolean NOT NULL DEFAULT false,
   "is_resolved" boolean NOT NULL DEFAULT false,
   "message" VARCHAR(1000),
-  "modified_at" timestamp DEFAULT (CURRENT_TIMESTAMP),
-  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  "modified_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
 ALTER TABLE "book_category" ADD FOREIGN KEY ("book_id") REFERENCES "books" ("id");
