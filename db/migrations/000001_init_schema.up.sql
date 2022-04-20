@@ -3,7 +3,7 @@ CREATE TABLE "accounts" (
   "username" VARCHAR(255) UNIQUE NOT NULL,
   "email" VARCHAR(255) UNIQUE NOT NULL,
   "encoded_hash" VARCHAR(255) NOT NULL,
-  "avatar_uri" VARCHAR(255) NOT NULL DEFAULT (`/asserts/images/deafault_avatar.jpeg`),
+  "avatar_uri" VARCHAR(255) NOT NULL DEFAULT ('/asserts/images/deafault_avatar.jpeg'),
   "is_admin" boolean NOT NULL DEFAULT false,
   "modified_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
@@ -21,7 +21,7 @@ CREATE TABLE "books" (
 CREATE TABLE "categories" (
   "id" SERIAL PRIMARY KEY,
   "name" VARCHAR(255) NOT NULL,
-  "description" VARCHAR(10000),
+  "description" VARCHAR(10000) NOT NULL,
   "modified_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );

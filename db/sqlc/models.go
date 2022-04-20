@@ -43,11 +43,11 @@ type Bookmark struct {
 }
 
 type Category struct {
-	ID          int32          `json:"id"`
-	Name        string         `json:"name"`
-	Description sql.NullString `json:"description"`
-	ModifiedAt  time.Time      `json:"modified_at"`
-	CreatedAt   time.Time      `json:"created_at"`
+	ID          int32     `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	ModifiedAt  time.Time `json:"modified_at"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Comment struct {

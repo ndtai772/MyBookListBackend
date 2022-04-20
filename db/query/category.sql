@@ -13,9 +13,7 @@ WHERE id = $1 LIMIT 1;
 
 -- name: ListCategories :many
 SELECT *
-FROM categories
-LIMIT $1
-OFFSET $2;
+FROM categories;
 
 -- name: UpdateCategory :one
 UPDATE categories

@@ -3,6 +3,8 @@ MIGRATE=./bin/migrate/migrate
 
 up:
 	docker-compose up
+
+createdb:
 	docker exec backend-db-1 createdb --username=dev --owner=dev my_book_list
 
 migrateup:

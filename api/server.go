@@ -28,18 +28,18 @@ func (server *Server) setupRouter() {
 	// Accounts
 	publicRoutes.POST("/accounts", server.createAccount)
 	publicRoutes.GET("/accounts/:id", server.getAccount)
-	// authRoutes.PATCH("/accounts/:id", unimplemented("update account info"))
-	// authRoutes.DELETE("/accounts/:id", unimplemented("inactive account"))
-	// authRoutes.GET("/accounts/:id/feedbacks", unimplemented("get personal feedbacks"))
+	authRoutes.PATCH("/accounts/:id", unimplemented("update account info"))
+	authRoutes.DELETE("/accounts/:id", unimplemented("inactive account"))
+	authRoutes.GET("/accounts/:id/feedbacks", unimplemented("get personal feedbacks"))
 	authRoutes.GET("/accounts/:id/bookmarks", server.listPersonalBookmarks)
 	authRoutes.GET("/accounts/:id/rates", server.listPersonalRates)
 
-	// // Feedbacks
-	// authRoutes.GET("/feedbacks", unimplemented("list all user feedbacks"))
-	// authRoutes.POST("/feedbacks", unimplemented("create feedback"))
-	// authRoutes.GET("/feedbacks/:id", unimplemented("get feedback by id"))
-	// authRoutes.PATCH("/feedbacks/:id", unimplemented("update feedback"))
-	// authRoutes.DELETE("/feedbacks/:id", unimplemented("delete a feedback"))
+	// Feedbacks
+	authRoutes.GET("/feedbacks", unimplemented("list all user feedbacks"))
+	authRoutes.POST("/feedbacks", unimplemented("create feedback"))
+	authRoutes.GET("/feedbacks/:id", unimplemented("get feedback by id"))
+	authRoutes.PATCH("/feedbacks/:id", unimplemented("update feedback"))
+	authRoutes.DELETE("/feedbacks/:id", unimplemented("delete a feedback"))
 
 	// Books
 	publicRoutes.GET("/books", server.listBooks)
@@ -51,11 +51,12 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/books/:id/comments", server.listBookComments)
 
 	// Categories
-	authRoutes.GET("/categories", unimplemented("list categories"))
-	authRoutes.POST("/categories", unimplemented("create category"))
-	authRoutes.GET("/categories/:id", unimplemented("get category by id"))
+	authRoutes.GET("/categories", server.listCategories)
+	authRoutes.POST("/categories", server.createCategory)
+	// authRoutes.GET("/categories/:id", unimplemented("get category by id"))
 	authRoutes.PATCH("/categories/:id", unimplemented("update category info"))
 	authRoutes.DELETE("/categories/:id", unimplemented("delete a category"))
+	authRoutes.GET("/categories/:id/books", server.listBooksByCategory)
 
 	// Bookmarks
 	authRoutes.POST("/bookmarks", unimplemented("create bookmark"))

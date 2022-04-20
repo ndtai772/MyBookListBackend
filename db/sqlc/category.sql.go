@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createCategory = `-- name: CreateCategory :one
@@ -20,8 +19,8 @@ INSERT INTO categories (
 `
 
 type CreateCategoryParams struct {
-	Name        string         `json:"name"`
-	Description sql.NullString `json:"description"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) (Category, error) {
@@ -69,17 +68,10 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
 const listCategories = `-- name: ListCategories :many
 SELECT id, name, description, modified_at, created_at
 FROM categories
-LIMIT $1
-OFFSET $2
 `
 
-type ListCategoriesParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
-
-func (q *Queries) ListCategories(ctx context.Context, arg ListCategoriesParams) ([]Category, error) {
-	rows, err := q.db.QueryContext(ctx, listCategories, arg.Limit, arg.Offset)
+func (q *Queries) ListCategories(ctx context.Context) ([]Category, error) {
+	rows, err := q.db.QueryContext(ctx, listCategories)
 	if err != nil {
 		return nil, err
 	}
@@ -116,9 +108,9 @@ RETURNING id, name, description, modified_at, created_at
 `
 
 type UpdateCategoryParams struct {
-	ID          int32          `json:"id"`
-	Name        string         `json:"name"`
-	Description sql.NullString `json:"description"`
+	ID          int32  `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error) {
