@@ -63,9 +63,9 @@ func (server *Server) setupRouter() {
 	authRoutes.DELETE("/bookmarks/:id", server.deleteBookmark)
 
 	// Rates
-	authRoutes.POST("/rates", unimplemented("create rate"))
-	authRoutes.GET("/rates/:id", unimplemented("get rate by id"))
-	authRoutes.PATCH("/rates/:id", unimplemented("update rate"))
+	authRoutes.POST("/rates", server.createRate)
+	// authRoutes.GET("/rates/:id", unimplemented("get rate by id"))
+	authRoutes.PATCH("/rates/:id", server.updateRate)
 	authRoutes.DELETE("/rates/:id", unimplemented("delete a rate"))
 
 	// Comments
