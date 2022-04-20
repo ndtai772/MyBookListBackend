@@ -72,6 +72,7 @@ func (q *Queries) GetBook(ctx context.Context, id int32) (Book, error) {
 const listBooks = `-- name: ListBooks :many
 SELECT id, title, author, description, modified_at, created_at
 FROM books
+ORDER BY id DESC
 LIMIT $1
 OFFSET $2
 `

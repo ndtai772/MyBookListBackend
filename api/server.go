@@ -45,10 +45,10 @@ func (server *Server) setupRouter() {
 	publicRoutes.GET("/books", server.listBooks)
 	authRoutes.POST("/books", server.createBook)
 	authRoutes.GET("/books/:id", server.getBook)
-	authRoutes.PATCH("/books/:id", unimplemented("update book info"))
-	authRoutes.DELETE("/books/:id", unimplemented("delete a book"))
-	authRoutes.GET("/books/:id/rates", unimplemented("get rates of a book"))
-	authRoutes.GET("/books/:id/comments", unimplemented("get comments of a book"))
+	authRoutes.PATCH("/books/:id", server.updateBook)
+	authRoutes.DELETE("/books/:id", server.deleteBook)
+	authRoutes.GET("/books/:id/rates", server.listBookRates)
+	authRoutes.GET("/books/:id/comments", server.listBookComments)
 
 	// Categories
 	authRoutes.GET("/categories", unimplemented("list categories"))
