@@ -37,6 +37,7 @@ type Querier interface {
 	ListBooksByCategoryId(ctx context.Context, arg ListBooksByCategoryIdParams) ([]Book, error)
 	ListCategories(ctx context.Context) ([]Category, error)
 	ListComments(ctx context.Context, arg ListCommentsParams) ([]Comment, error)
+	ListCommentsByAccoutId(ctx context.Context, arg ListCommentsByAccoutIdParams) ([]Comment, error)
 	ListCommentsByBookId(ctx context.Context, arg ListCommentsByBookIdParams) ([]Comment, error)
 	ListFeedbacks(ctx context.Context, arg ListFeedbacksParams) ([]Feedback, error)
 	ListRatesByAccountId(ctx context.Context, arg ListRatesByAccountIdParams) ([]Rate, error)

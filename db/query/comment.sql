@@ -35,3 +35,11 @@ WHERE book_id = $3
 ORDER BY id DESC
 LIMIT $1
 OFFSET $2;
+
+-- name: ListCommentsByAccoutId :many
+SELECT *
+FROM comments
+WHERE created_by = $3
+ORDER BY id DESC
+LIMIT $1
+OFFSET $2;

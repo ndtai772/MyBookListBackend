@@ -78,13 +78,13 @@ func (server *Server) listPersonalBookmarks(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H {
-		"data": bookmarks,
+	ctx.JSON(http.StatusOK, gin.H{
+		"data":       bookmarks,
 		"next_index": offset + int32(len(bookmarks)),
 	})
 }
 
-func (server *Server) listPersonalRates(ctx * gin.Context) {
+func (server *Server) listPersonalRates(ctx *gin.Context) {
 	id, err := parseIdUri(ctx)
 
 	if err != nil {
@@ -107,8 +107,39 @@ func (server *Server) listPersonalRates(ctx * gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H {
-		"data": rates,
+	ctx.JSON(http.StatusOK, gin.H{
+		"data":       rates,
 		"next_index": offset + int32(len(rates)),
+	})
+}
+
+func (server *Server) listPersonalComments(ctx *gin.Context) {
+	accountId, err := parseIdUri(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	limit, offset, err := parsePaginateQuery(ctx)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	comments, err := server.store.ListCommentsByAccoutId(ctx, db.ListCommentsByAccoutIdParams{
+		Limit:     limit,
+		Offset:    offset,
+		CreatedBy: accountId,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"data":       comments,
+		"next_index": offset + int32(len(comments)),
 	})
 }

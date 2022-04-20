@@ -111,6 +111,51 @@ func (q *Queries) ListComments(ctx context.Context, arg ListCommentsParams) ([]C
 	return items, nil
 }
 
+const listCommentsByAccoutId = `-- name: ListCommentsByAccoutId :many
+SELECT id, content, book_id, created_by, modified_at, created_at
+FROM comments
+WHERE created_by = $3
+ORDER BY id DESC
+LIMIT $1
+OFFSET $2
+`
+
+type ListCommentsByAccoutIdParams struct {
+	Limit     int32 `json:"limit"`
+	Offset    int32 `json:"offset"`
+	CreatedBy int32 `json:"created_by"`
+}
+
+func (q *Queries) ListCommentsByAccoutId(ctx context.Context, arg ListCommentsByAccoutIdParams) ([]Comment, error) {
+	rows, err := q.db.QueryContext(ctx, listCommentsByAccoutId, arg.Limit, arg.Offset, arg.CreatedBy)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Comment{}
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Content,
+			&i.BookID,
+			&i.CreatedBy,
+			&i.ModifiedAt,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listCommentsByBookId = `-- name: ListCommentsByBookId :many
 SELECT id, content, book_id, created_by, modified_at, created_at
 FROM comments

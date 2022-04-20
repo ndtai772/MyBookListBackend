@@ -33,6 +33,7 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/accounts/:id/feedbacks", unimplemented("get personal feedbacks"))
 	authRoutes.GET("/accounts/:id/bookmarks", server.listPersonalBookmarks)
 	authRoutes.GET("/accounts/:id/rates", server.listPersonalRates)
+	authRoutes.GET("/accounts/:id/comments", server.listPersonalComments)
 
 	// Feedbacks
 	authRoutes.GET("/feedbacks", unimplemented("list all user feedbacks"))
@@ -69,9 +70,8 @@ func (server *Server) setupRouter() {
 	authRoutes.DELETE("/rates/:id", unimplemented("delete a rate"))
 
 	// Comments
-	authRoutes.POST("/comments", unimplemented("create comment"))
-	authRoutes.GET("/comments/:id", unimplemented("get rate by id"))
-	authRoutes.DELETE("/comments/:id", unimplemented("delete a rate"))
+	authRoutes.POST("/comments", server.createComment)
+	authRoutes.DELETE("/comments/:id", server.deleteComment)
 
 	server.router = router
 }
