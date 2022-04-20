@@ -1,8 +1,8 @@
 -- name: CreateAccount :one
 INSERT INTO accounts (
-    id,
     username,
     email,
+    encoded_hash,
     is_admin
 ) VALUES (
     $1, $2, $3, $4

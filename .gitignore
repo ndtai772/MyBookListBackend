@@ -16,3 +16,9 @@
 
 # binary tools
 bin/
+
+**/.vagrant
+ansible
+openapi/
+
+tmp
