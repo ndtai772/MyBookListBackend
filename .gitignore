@@ -18,7 +18,8 @@
 bin/
 
 **/.vagrant
-ansible
 openapi/
+
+.vscode
 
 tmp

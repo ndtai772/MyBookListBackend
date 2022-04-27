@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files: vars.yaml
+
+  tasks:
+    - name: Create new Droplet
+      community.digitalocean.digital_ocean_droplet:
+        state: present
+        name: "{{ DROPLET_NAME }}"
+        size: s-1vcpu-1gb
+        image_id: ubuntu-20-04-x64
+        unique_name: true
+        region: sgp1
+        ssh_keys: "{{ SSH_KEY }}"
+        project_name: "{{ DO_PROJECT_NAME }}"
+      register: do
+
+    - name: Config domain name
+      community.digitalocean.digital_ocean_domain_record:
+        domain: "{{ DOMAIN_NAME }}"
+        type: A
+        name: "{{ DROPLET_SUB_DOMAIN }}"
+        ttl: 3600
+        data: "{{ item.ip_address }}"
+        state: present
+        force_update: true
+      loop: "{{ do.data.droplet.networks.v4 }}"
+      when: item.type|string == 'public'

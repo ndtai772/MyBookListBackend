@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files: vars.yaml
+
+  tasks:
+    - name: Create new Droplet
+      community.digitalocean.digital_ocean_droplet:
+        state: absent
+        name: "{{ DROPLET_NAME }}"
+        size: s-1vcpu-1gb
+        image_id: ubuntu-20-04-x64
+        unique_name: true
+        region: sgp1
+        ssh_keys: "{{ SSH_KEY }}"
+        project_name: "{{ DO_PROJECT_NAME }}"
+      register: do
