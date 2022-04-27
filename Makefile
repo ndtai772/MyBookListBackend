@@ -10,11 +10,8 @@ createdb:
 migrateup:
 	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose up
 
-migrateup1:
-	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose up 1
+build:
+	go build -o bin/server main.go
 
-migratedown:
-	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose down
-
-migratedown1:
-	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose down 1
+run:
+	./bin/server
