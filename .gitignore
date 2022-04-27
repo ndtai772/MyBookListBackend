@@ -22,3 +22,4 @@ ansible
 openapi/
 
 tmp
+.vscode
