@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
+	"github.com/ndtai772/MyBookListBackend/token"
 	"github.com/ndtai772/MyBookListBackend/util"
 )
 
@@ -90,6 +91,13 @@ func (server *Server) listPersonalBookmarks(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	if authPayload.AccountID != id {
+		ctx.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 

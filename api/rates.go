@@ -6,14 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
+	"github.com/ndtai772/MyBookListBackend/token"
 )
 
 func (server *Server) createRate(ctx *gin.Context) {
 	var createRateForm struct {
-		score     int32 `form:"score,omitempty"`
-		createdBy int32 `form:"created_by" binding:"required"`
-		bookId    int32 `form:"book_id" binding:"required"`
+		score  int32 `form:"score" binding:"required"`
+		bookId int32 `form:"book_id" binding:"required"`
 	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
 	if err := ctx.ShouldBindWith(&createRateForm, binding.Form); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -21,8 +23,8 @@ func (server *Server) createRate(ctx *gin.Context) {
 	}
 
 	createRateParams := db.CreateRateParams{
-		BookID: createRateForm.bookId,
-		CreatedBy: createRateForm.createdBy,
+		BookID:    createRateForm.bookId,
+		CreatedBy: authPayload.AccountID,
 		RateValue: createRateForm.score,
 	}
 
@@ -37,6 +39,7 @@ func (server *Server) createRate(ctx *gin.Context) {
 }
 
 func (server *Server) updateRate(ctx *gin.Context) {
+	// TODO: verify ownership of the rate
 	rateId, err := parseIdUri(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -44,7 +47,7 @@ func (server *Server) updateRate(ctx *gin.Context) {
 	}
 
 	var updateRateForm struct {
-		score     int32 `form:"score,omitempty"`
+		score int32 `form:"score" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindWith(&updateRateForm, binding.Form); err != nil {
@@ -54,8 +57,8 @@ func (server *Server) updateRate(ctx *gin.Context) {
 
 	rate, err := server.store.UpdateRate(ctx, db.UpdateRateParams{
 		RateValue: updateRateForm.score,
-		ID: rateId,
-	});
+		ID:        rateId,
+	})
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))

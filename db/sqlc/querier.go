@@ -21,6 +21,7 @@ type Querier interface {
 	DeleteComment(ctx context.Context, id int32) error
 	DeleteRate(ctx context.Context, id int32) error
 	GetAccount(ctx context.Context, id int32) (Account, error)
+	GetAccountByEmail(ctx context.Context, email string) (Account, error)
 	GetBook(ctx context.Context, id int32) (Book, error)
 	GetBookmark(ctx context.Context, id int32) (Bookmark, error)
 	GetCategory(ctx context.Context, id int32) (Category, error)
