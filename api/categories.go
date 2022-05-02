@@ -50,7 +50,7 @@ func (server *Server) listBooksByCategory(ctx *gin.Context) {
 		return
 	}
 
-	limit, offset, err := parsePaginateQuery(ctx)
+	page_size, last_id, err := parsePaginateQuery(ctx)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -58,8 +58,8 @@ func (server *Server) listBooksByCategory(ctx *gin.Context) {
 	}
 
 	listParams := db.ListBooksByCategoryIdParams{
-		Limit:      limit,
-		Offset:     offset,
+		Limit:      page_size,
+		LastID:     last_id,
 		CategoryID: id,
 	}
 
@@ -70,8 +70,14 @@ func (server *Server) listBooksByCategory(ctx *gin.Context) {
 		return
 	}
 
+	lastId := -1
+	if len(books) > 0 {
+		lastId = int(books[len(books)-1].ID)
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"data":       books,
-		"next_index": offset + int32(len(books)),
+		"data":      books,
+		"page_size": page_size,
+		"last_id":   lastId,
 	})
 }

@@ -6,6 +6,6 @@ INSERT INTO book_category (
     $1, $2
 ) RETURNING *;
 
--- name: DeleteBookCategory :exec
-DELETE FROM book_category
-WHERE book_id = $1 AND category_id = $2;
+-- -- name: DeleteBookCategory :exec
+-- DELETE FROM book_category
+-- WHERE book_id = $1 AND category_id = $2;

@@ -14,11 +14,11 @@ func parseIdUri(ctx *gin.Context) (int32, error) {
 
 func parsePaginateQuery(ctx *gin.Context) (int32, int32, error) {
 	var paginateQuery struct {
-		Limit  int32 `form:"limit" binding:"min=1"`
-		Offset int32 `form:"limit" binding:"min=0"`
+		PageSize  int32 `form:"page_size" binding:"min=1"`
+		LastID int32 `form:"last_id" binding:"min=0"`
 	}
 
 	err := ctx.ShouldBindQuery(&paginateQuery)
 
-	return paginateQuery.Limit, paginateQuery.Offset, err
+	return paginateQuery.PageSize, paginateQuery.LastID, err
 }

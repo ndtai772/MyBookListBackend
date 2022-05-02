@@ -13,44 +13,54 @@ const createBook = `-- name: CreateBook :one
 INSERT INTO books (
     title,
     author,
-    description
+    description,
+    year,
+    language,
+    publisher,
+    pages
 ) VALUES (
-    $1, $2, $3
-) RETURNING id, title, author, description, modified_at, created_at
+    $1, $2, $3, $4, $5, $6, $7
+) RETURNING id, title, author, description, year, language, publisher, pages, cover_url, created_at
 `
 
 type CreateBookParams struct {
 	Title       string `json:"title"`
 	Author      string `json:"author"`
 	Description string `json:"description"`
+	Year        int16  `json:"year"`
+	Language    string `json:"language"`
+	Publisher   string `json:"publisher"`
+	Pages       int16  `json:"pages"`
 }
 
 func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, error) {
-	row := q.db.QueryRowContext(ctx, createBook, arg.Title, arg.Author, arg.Description)
+	row := q.db.QueryRowContext(ctx, createBook,
+		arg.Title,
+		arg.Author,
+		arg.Description,
+		arg.Year,
+		arg.Language,
+		arg.Publisher,
+		arg.Pages,
+	)
 	var i Book
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
 		&i.Author,
 		&i.Description,
-		&i.ModifiedAt,
+		&i.Year,
+		&i.Language,
+		&i.Publisher,
+		&i.Pages,
+		&i.CoverUrl,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
-const deleteBook = `-- name: DeleteBook :exec
-DELETE FROM books
-WHERE id = $1
-`
-
-func (q *Queries) DeleteBook(ctx context.Context, id int32) error {
-	_, err := q.db.ExecContext(ctx, deleteBook, id)
-	return err
-}
-
 const getBook = `-- name: GetBook :one
-SELECT id, title, author, description, modified_at, created_at
+SELECT id, title, author, description, year, language, publisher, pages, cover_url, created_at
 FROM books
 WHERE id = $1 LIMIT 1
 `
@@ -63,27 +73,31 @@ func (q *Queries) GetBook(ctx context.Context, id int32) (Book, error) {
 		&i.Title,
 		&i.Author,
 		&i.Description,
-		&i.ModifiedAt,
+		&i.Year,
+		&i.Language,
+		&i.Publisher,
+		&i.Pages,
+		&i.CoverUrl,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const listBooks = `-- name: ListBooks :many
-SELECT id, title, author, description, modified_at, created_at
+SELECT id, title, author, description, year, language, publisher, pages, cover_url, created_at
 FROM books
+WHERE NOT id > $2
 ORDER BY id DESC
 LIMIT $1
-OFFSET $2
 `
 
 type ListBooksParams struct {
 	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	LastID int32 `json:"last_id"`
 }
 
 func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, error) {
-	rows, err := q.db.QueryContext(ctx, listBooks, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listBooks, arg.Limit, arg.LastID)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +110,11 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 			&i.Title,
 			&i.Author,
 			&i.Description,
-			&i.ModifiedAt,
+			&i.Year,
+			&i.Language,
+			&i.Publisher,
+			&i.Pages,
+			&i.CoverUrl,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -110,39 +128,4 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateBook = `-- name: UpdateBook :one
-UPDATE books
-SET title = $2,
-    author = $3,
-    description = $4
-WHERE id = $1
-RETURNING id, title, author, description, modified_at, created_at
-`
-
-type UpdateBookParams struct {
-	ID          int32  `json:"id"`
-	Title       string `json:"title"`
-	Author      string `json:"author"`
-	Description string `json:"description"`
-}
-
-func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error) {
-	row := q.db.QueryRowContext(ctx, updateBook,
-		arg.ID,
-		arg.Title,
-		arg.Author,
-		arg.Description,
-	)
-	var i Book
-	err := row.Scan(
-		&i.ID,
-		&i.Title,
-		&i.Author,
-		&i.Description,
-		&i.ModifiedAt,
-		&i.CreatedAt,
-	)
-	return i, err
 }

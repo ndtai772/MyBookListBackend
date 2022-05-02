@@ -16,7 +16,7 @@ INSERT INTO comments (
     created_by
 ) VALUES (
     $1, $2, $3
-) RETURNING id, content, book_id, created_by, modified_at, created_at
+) RETURNING id, content, book_id, created_by, created_at
 `
 
 type CreateCommentParams struct {
@@ -33,7 +33,6 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (C
 		&i.Content,
 		&i.BookID,
 		&i.CreatedBy,
-		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -50,7 +49,7 @@ func (q *Queries) DeleteComment(ctx context.Context, id int32) error {
 }
 
 const getComment = `-- name: GetComment :one
-SELECT id, content, book_id, created_by, modified_at, created_at
+SELECT id, content, book_id, created_by, created_at
 FROM comments
 WHERE id = $1 LIMIT 1
 `
@@ -63,116 +62,27 @@ func (q *Queries) GetComment(ctx context.Context, id int32) (Comment, error) {
 		&i.Content,
 		&i.BookID,
 		&i.CreatedBy,
-		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
-const listComments = `-- name: ListComments :many
-SELECT id, content, book_id, created_by, modified_at, created_at
-FROM comments
-LIMIT $1
-OFFSET $2
-`
-
-type ListCommentsParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
-
-func (q *Queries) ListComments(ctx context.Context, arg ListCommentsParams) ([]Comment, error) {
-	rows, err := q.db.QueryContext(ctx, listComments, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Comment{}
-	for rows.Next() {
-		var i Comment
-		if err := rows.Scan(
-			&i.ID,
-			&i.Content,
-			&i.BookID,
-			&i.CreatedBy,
-			&i.ModifiedAt,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listCommentsByAccoutId = `-- name: ListCommentsByAccoutId :many
-SELECT id, content, book_id, created_by, modified_at, created_at
-FROM comments
-WHERE created_by = $3
-ORDER BY id DESC
-LIMIT $1
-OFFSET $2
-`
-
-type ListCommentsByAccoutIdParams struct {
-	Limit     int32 `json:"limit"`
-	Offset    int32 `json:"offset"`
-	CreatedBy int32 `json:"created_by"`
-}
-
-func (q *Queries) ListCommentsByAccoutId(ctx context.Context, arg ListCommentsByAccoutIdParams) ([]Comment, error) {
-	rows, err := q.db.QueryContext(ctx, listCommentsByAccoutId, arg.Limit, arg.Offset, arg.CreatedBy)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Comment{}
-	for rows.Next() {
-		var i Comment
-		if err := rows.Scan(
-			&i.ID,
-			&i.Content,
-			&i.BookID,
-			&i.CreatedBy,
-			&i.ModifiedAt,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const listCommentsByBookId = `-- name: ListCommentsByBookId :many
-SELECT id, content, book_id, created_by, modified_at, created_at
+SELECT id, content, book_id, created_by, created_at
 FROM comments
-WHERE book_id = $3
+WHERE book_id = $2 AND NOT id > $3
 ORDER BY id DESC
 LIMIT $1
-OFFSET $2
 `
 
 type ListCommentsByBookIdParams struct {
 	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
 	BookID int32 `json:"book_id"`
+	LastID int32 `json:"last_id"`
 }
 
 func (q *Queries) ListCommentsByBookId(ctx context.Context, arg ListCommentsByBookIdParams) ([]Comment, error) {
-	rows, err := q.db.QueryContext(ctx, listCommentsByBookId, arg.Limit, arg.Offset, arg.BookID)
+	rows, err := q.db.QueryContext(ctx, listCommentsByBookId, arg.Limit, arg.BookID, arg.LastID)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +95,6 @@ func (q *Queries) ListCommentsByBookId(ctx context.Context, arg ListCommentsByBo
 			&i.Content,
 			&i.BookID,
 			&i.CreatedBy,
-			&i.ModifiedAt,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -205,7 +114,7 @@ const updateComment = `-- name: UpdateComment :one
 UPDATE comments
 SET content = $2
 WHERE id = $1
-RETURNING id, content, book_id, created_by, modified_at, created_at
+RETURNING id, content, book_id, created_by, created_at
 `
 
 type UpdateCommentParams struct {
@@ -221,7 +130,6 @@ func (q *Queries) UpdateComment(ctx context.Context, arg UpdateCommentParams) (C
 		&i.Content,
 		&i.BookID,
 		&i.CreatedBy,
-		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
 	return i, err

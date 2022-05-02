@@ -4,14 +4,14 @@ import (
 	"database/sql"
 	"log"
 
+	_ "github.com/lib/pq"
 	"github.com/ndtai772/MyBookListBackend/api"
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
-	_ "github.com/lib/pq"
 )
 
 const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://dev:123@localhost:5432/my_book_list?sslmode=disable"
+	dbDriver      = "postgres"
+	dbSource      = "postgresql://dev:123@localhost:5432/my_book_list?sslmode=disable"
 	serverAddress = "0.0.0.0:8080"
 )
 

@@ -15,7 +15,7 @@ INSERT INTO categories (
     description
 ) VALUES (
     $1, $2
-) RETURNING id, name, description, modified_at, created_at
+) RETURNING id, name, description, created_at
 `
 
 type CreateCategoryParams struct {
@@ -30,7 +30,6 @@ func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) 
 		&i.ID,
 		&i.Name,
 		&i.Description,
-		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -47,7 +46,7 @@ func (q *Queries) DeleteCategory(ctx context.Context, id int32) error {
 }
 
 const getCategory = `-- name: GetCategory :one
-SELECT id, name, description, modified_at, created_at
+SELECT id, name, description, created_at
 FROM categories
 WHERE id = $1 LIMIT 1
 `
@@ -59,14 +58,13 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
 		&i.ID,
 		&i.Name,
 		&i.Description,
-		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const listCategories = `-- name: ListCategories :many
-SELECT id, name, description, modified_at, created_at
+SELECT id, name, description, created_at
 FROM categories
 `
 
@@ -83,7 +81,6 @@ func (q *Queries) ListCategories(ctx context.Context) ([]Category, error) {
 			&i.ID,
 			&i.Name,
 			&i.Description,
-			&i.ModifiedAt,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -104,7 +101,7 @@ UPDATE categories
 SET name = $2,
     description = $3
 WHERE id = $1
-RETURNING id, name, description, modified_at, created_at
+RETURNING id, name, description, created_at
 `
 
 type UpdateCategoryParams struct {
@@ -120,7 +117,6 @@ func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) 
 		&i.ID,
 		&i.Name,
 		&i.Description,
-		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
 	return i, err
