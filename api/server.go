@@ -17,6 +17,10 @@ type Server struct {
 	tokenMaker token.Maker
 }
 
+const (
+	DOMAIN_NAME = "api.mybooklist.ndtai.me"
+)
+
 func NewServer(store *db.Store) *Server {
 	tokenMaker, err := token.NewJWTMaker(util.RandomString(32))
 	if err != nil {
@@ -33,6 +37,10 @@ func (server *Server) setupRouter() {
 
 	publicRoutes := router.Group("/")
 	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
+	// Static
+	publicRoutes.StaticFile("/", fmt.Sprintf("/var/www/%s/api-doc.html", DOMAIN_NAME))
+	publicRoutes.StaticFile("/api-schema.yaml", fmt.Sprintf("/var/www/%s/api-schema.yaml", DOMAIN_NAME))
 
 	//Auth
 	publicRoutes.POST("/auth/login", server.login)

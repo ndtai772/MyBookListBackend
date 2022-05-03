@@ -16,16 +16,31 @@
 - hosts: do
   vars:
     app_dir: "{{ playbook_dir }}/.."
+    pid_path: /tmp/mybooklist-server.pid
   
   tasks:
+    - name: Copy static files to server
+      ansible.builtin.copy:
+        src: "{{ app_dir }}/asserts/"
+        dest: /var/www/api.mybooklist.ndtai.me/
+        force: true
     - name: Copy binary file to server
       ansible.builtin.copy:
         src: "{{ app_dir }}/bin/server"
         dest: /server
         mode: 0500
         force: true
-    - name: Run server
+    - name: Check if server process id exists
+      ansible.builtin.stat:
+        path: "{{ pid_path }}"
+      register: pid_data
+    - name: Kill the old server
+      ansible.builtin.shell:
+        kill $(cat {{ pid_path }})
+      when: pid_data.stat.exists
+    - name: Run new server
       ansible.builtin.shell: |
         nohup /server 1>>/var/log/mybooklist_backend.log 2>>/var/log/mybooklist_backend.error.log &
+        echo "$!" > {{ pid_path }}
       args:
         executable: /bin/bash
