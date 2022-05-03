@@ -1,0 +1,15 @@
+- hosts: do
+
+  tasks:
+    - name: Get tls cert
+      ansible.builtin.include_role:
+        name: geerlingguy.certbot
+      vars:
+        certbot_install_method: snap
+        certbot_auto_renew: false
+        certbot_create_if_missing: true
+        certbot_create_method: standalone
+        certbot_certs:
+          - email: ndtai772@gmail.com
+            domains:
+              - api.mybooklist.ndtai.me

@@ -18,7 +18,6 @@
 bin/
 
 **/.vagrant
-ansible
 openapi/
 
 tmp
