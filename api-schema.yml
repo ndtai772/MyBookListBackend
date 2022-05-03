@@ -226,7 +226,6 @@ paths:
               schema:
                 properties:
                   access_token: { type: string, format: JWT }
-                  refresh_token: { type: string, format: JWT }
         400: { $ref: "#/components/responses/BadRequest" }
         422: { $ref: "#/components/responses/InvalidRequestSchema" }
 

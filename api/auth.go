@@ -9,8 +9,8 @@ import (
 	"github.com/ndtai772/MyBookListBackend/util"
 )
 
-var accessTokenDuration = time.Duration.Minutes(15)
-var refreshTokenDuration = time.Duration.Hours(7 * 24)
+var accessTokenDuration = time.Minute * 15
+var refreshTokenDuration = time.Hour * 24 * 7
 
 func (server *Server) login(ctx *gin.Context) {
 	var loginReq struct {
@@ -36,7 +36,7 @@ func (server *Server) login(ctx *gin.Context) {
 
 	accessToken, _, err := server.tokenMaker.CreateToken(
 		account.ID,
-		time.Duration(accessTokenDuration),
+		accessTokenDuration,
 	)
 
 	if err != nil {
@@ -54,8 +54,72 @@ func (server *Server) login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H {
-		"access_token": accessToken,
+	ctx.JSON(http.StatusOK, gin.H{
+		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+	})
+}
+
+func (server *Server) renewAccessToken(ctx *gin.Context) {
+	var req struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	// session, err := server.store.GetSession(ctx, refreshPayload.ID)
+	// if err != nil {
+	// 	if err == sql.ErrNoRows {
+	// 		ctx.JSON(http.StatusNotFound, errorResponse(err))
+	// 		return
+	// 	}
+	// 	ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	// 	return
+	// }
+
+	// if session.IsBlocked {
+	// 	err := fmt.Errorf("blocked session")
+	// 	ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+	// 	return
+	// }
+
+	// if session.Username != refreshPayload.Username {
+	// 	err := fmt.Errorf("incorrect session user")
+	// 	ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+	// 	return
+	// }
+
+	// if session.RefreshToken != req.RefreshToken {
+	// 	err := fmt.Errorf("mismatched session token")
+	// 	ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+	// 	return
+	// }
+
+	// if time.Now().After(session.ExpiresAt) {
+	// 	err := fmt.Errorf("expired session")
+	// 	ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+	// 	return
+	// }
+
+	accessToken, _, err := server.tokenMaker.CreateToken(
+		refreshPayload.AccountID,
+		accessTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"access_token": accessToken,
 	})
 }

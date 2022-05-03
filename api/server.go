@@ -36,6 +36,7 @@ func (server *Server) setupRouter() {
 
 	//Auth
 	publicRoutes.POST("/auth/login", server.login)
+	publicRoutes.POST("/auth/refresh", server.renewAccessToken)
 
 	// Accounts
 	publicRoutes.POST("/accounts", server.createAccount)
