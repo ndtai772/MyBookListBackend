@@ -3,7 +3,7 @@ info:
   title: MyBookList API
   version: "0.1.0"
 servers:
-  - url: https://api.mybooklist.ndtai.me/v1
+  - url: https://api.mybooklist.ndtai.me
 security:
   - BearerAuth: []
 
