@@ -26,6 +26,10 @@ func (server *Server) listBooks(ctx *gin.Context) {
 		return
 	}
 
+	for i := range books {
+		books[i].CoverUrl = "http://libgen.rs/covers/" + books[i].CoverUrl
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"data":      books,
 		"page_size": page_size,

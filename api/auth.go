@@ -57,6 +57,7 @@ func (server *Server) login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+		"account": toAccountRes(account),
 	})
 }
 

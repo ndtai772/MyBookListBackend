@@ -5,7 +5,6 @@
 package db
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -39,31 +38,31 @@ type BookCategory struct {
 }
 
 type BookDetail struct {
-	ID            int32         `json:"id"`
-	Title         string        `json:"title"`
-	Author        string        `json:"author"`
-	Description   string        `json:"description"`
-	Year          int16         `json:"year"`
-	Language      string        `json:"language"`
-	Publisher     string        `json:"publisher"`
-	Pages         int16         `json:"pages"`
-	CoverUrl      string        `json:"cover_url"`
-	CreatedAt     time.Time     `json:"created_at"`
-	Categories    []byte        `json:"categories"`
-	CommentCount  sql.NullInt64 `json:"comment_count"`
-	BookmarkCount sql.NullInt64 `json:"bookmark_count"`
-	RateCount     sql.NullInt64 `json:"rate_count"`
-	RateAvg       int32         `json:"rate_avg"`
-	Rate1         sql.NullInt64 `json:"rate_1"`
-	Rate2         sql.NullInt64 `json:"rate_2"`
-	Rate3         sql.NullInt64 `json:"rate_3"`
-	Rate4         sql.NullInt64 `json:"rate_4"`
-	Rate5         sql.NullInt64 `json:"rate_5"`
-	Rate6         sql.NullInt64 `json:"rate_6"`
-	Rate7         sql.NullInt64 `json:"rate_7"`
-	Rate8         sql.NullInt64 `json:"rate_8"`
-	Rate9         sql.NullInt64 `json:"rate_9"`
-	Rate10        sql.NullInt64 `json:"rate_10"`
+	ID            int32     `json:"id"`
+	Title         string    `json:"title"`
+	Author        string    `json:"author"`
+	Description   string    `json:"description"`
+	Year          int16     `json:"year"`
+	Language      string    `json:"language"`
+	Publisher     string    `json:"publisher"`
+	Pages         int16     `json:"pages"`
+	CoverUrl      string    `json:"cover_url"`
+	CreatedAt     time.Time `json:"created_at"`
+	Categories    []byte    `json:"categories"`
+	CommentCount  int64     `json:"comment_count"`
+	BookmarkCount int64     `json:"bookmark_count"`
+	RateCount     int64     `json:"rate_count"`
+	RateSum       int64     `json:"rate_sum"`
+	Rate1         int64     `json:"rate_1"`
+	Rate2         int64     `json:"rate_2"`
+	Rate3         int64     `json:"rate_3"`
+	Rate4         int64     `json:"rate_4"`
+	Rate5         int64     `json:"rate_5"`
+	Rate6         int64     `json:"rate_6"`
+	Rate7         int64     `json:"rate_7"`
+	Rate8         int64     `json:"rate_8"`
+	Rate9         int64     `json:"rate_9"`
+	Rate10        int64     `json:"rate_10"`
 }
 
 type Bookmark struct {

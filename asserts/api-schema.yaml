@@ -74,6 +74,7 @@ components:
             required: [score]
             properties:
               score: { type: integer, maximum: 10, minimum: 1 }
+              book_id: {type: integer}
     RateUpdate:
       required: true
       content:
@@ -138,7 +139,7 @@ components:
         title: { type: string }
         author: { type: string }
         description: { type: string }
-        rate_avg: { type: number, format: float }
+        rate_sum: { type: integer }
         rate_count: { type: integer }
         comment_count: { type: integer }
         categories:
@@ -365,7 +366,7 @@ paths:
         required: true
     get:
       summary: List comments about a book
-      tags: [Comment]
+      tags: [Book, Comment]
       parameters:
         - $ref: "#/components/parameters/page_size"
         - $ref: "#/components/parameters/last_id"
@@ -381,6 +382,25 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/CommentInfo" }
         401: { description: Unauthorize }
+
+  /books/{id}/rate:
+    parameters:
+      - name: id
+        in: path
+        schema: { type: integer }
+        required: true
+    get:
+      summary: View personal rate of a book
+      tags: [Rate]
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RateInfo" }
+        401: { description: Unauthorize }
+        403: { description: Forbidden }
+        404: { description: NotFound }
 
   /bookmarks:
     post:
@@ -409,22 +429,6 @@ paths:
         404: { description: NotFound }
 
   /rates:
-    get:
-      summary: List all personal rates
-      tags: [Rate]
-      parameters: [$ref: "#/components/parameters/account_id"]
-      responses:
-        200:
-          description: Ok
-          content:
-            application/json:
-              schema:
-                allOf: [$ref: "#/components/schemas/list"]
-                properties:
-                  data:
-                    type: array
-                    items: { $ref: "#/components/schemas/RateInfo" }
-        401: { description: Unauthorize }
     post:
       summary: Add rate
       tags: [Rate]
@@ -441,20 +445,8 @@ paths:
         in: path
         schema: { type: integer }
         required: true
-    get:
-      summary: View rate
-      tags: [Rate]
-      responses:
-        200:
-          description: Ok
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/RateInfo" }
-        401: { description: Unauthorize }
-        403: { description: Forbidden }
-        404: { description: NotFound }
     patch:
-      summary: Edit rate
+      summary: Update rate
       tags: [Rate]
       requestBody: { $ref: "#/components/requestBodies/RateUpdate" }
       responses:

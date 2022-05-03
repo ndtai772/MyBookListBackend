@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,7 @@ func toAccountRes(account db.Account) AccountRes {
 		ID:        account.ID,
 		Name:      account.Name,
 		Email:     account.Email,
-		AvatarUrl: fmt.Sprintf("%s%s", "{{baseUrl}}/resources/images", account.AvatarUrl),
+		AvatarUrl: fmt.Sprintf("https://ui-avatars.com/api/?name=%s", url.QueryEscape(account.Name)),
 		IsAdmin:   account.IsAdmin,
 		CreatedAt: account.CreatedAt,
 	}
@@ -109,7 +110,7 @@ func (server *Server) listPersonalBookmarks(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"data":      bookmarks,
+		"data": bookmarks,
 	})
 }
 

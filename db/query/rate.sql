@@ -23,9 +23,7 @@ RETURNING *;
 DELETE FROM rates
 WHERE id = $1;
 
--- -- name: ListRatesByAccountId :many
--- SELECT *
--- FROM rates
--- WHERE created_by = $3
--- LIMIT $1
--- OFFSET $2;
+-- name: GetPersonalRateOfABook :one
+SELECT *
+FROM rates
+WHERE created_by = $1 AND book_id = $2;

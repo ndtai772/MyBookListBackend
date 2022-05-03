@@ -13,12 +13,12 @@ INSERT INTO books (
 
 -- name: GetBook :one
 SELECT *
-FROM books
+FROM book_detail
 WHERE id = $1 LIMIT 1;
 
 -- name: ListBooks :many
-SELECT *
-FROM books
+SELECT id, title, author, language, cover_url, created_at, categories, comment_count, bookmark_count, rate_count, rate_sum
+FROM book_detail
 WHERE NOT id > @last_id
 ORDER BY id DESC
 LIMIT $1;
