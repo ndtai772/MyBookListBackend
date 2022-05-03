@@ -1,30 +1,24 @@
+---
 - hosts: do
   become: true
 
-  handlers:
-    - name: Clean apt
-      ansible.builtin.apt:
-        autoclean: true
-        autoremove: true
+  vars:
+    server_name: api.mybooklist.ndtai.me
+    expose_port: 8080
+    db_name: my_book_list
+    db_user: dev
+    db_pw: 123
 
-  tasks:
-    - name: Update apt cache
+  pre_tasks:
+    - name: update-apt-cache
       ansible.builtin.apt:
         update_cache: true
-        state: present
-    - name: Install apt packages
-      ansible.builtin.apt:
-        pkg:
-          - nginx
-        state: present
-      notify: Clean apt
-    - name: Start nginx
-      ansible.builtin.service:
-        name: nginx
-        state: started
-    - name: Get tls cert
-      ansible.builtin.include_role:
-        name: geerlingguy.certbot
+
+  roles:
+    - role: nginx
+      become: true
+    - role: geerlingguy.certbot
+      become: true
       vars:
         certbot_install_method: snap
         certbot_auto_renew: false
@@ -33,18 +27,7 @@
         certbot_certs:
           - email: ndtai772@gmail.com
             domains:
-              - api.mybooklist.ndtai.me
-    - name: Config nginx
+              - "{{ server_name }}"
+    - role: postgresql
       become: true
-      ansible.builtin.copy:
-        src: "./files/mybooklist_api.nginx.conf"
-        dest: "/etc/nginx/sites-available/mybooklist_api.conf"
-    - name: Add to site-enable
-      ansible.builtin.file:
-        src: "/etc/nginx/sites-available/mybooklist_api.conf"
-        dest: "/etc/nginx/sites-enabled/mybooklist_api.conf"
-        state: link
-    - name: Re nginx
-      ansible.builtin.service:
-        name: nginx
-        state: reloaded
+

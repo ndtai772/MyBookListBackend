@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  connection: local
+
+  vars:
+    app_dir: "{{ playbook_dir }}/.."
+
+  tasks:
+    - name: build app
+      ansible.builtin.shell: |
+        cd {{ app_dir }}
+        GOOS=linux GOARCH=amd64 go build -ldflags "-linkmode external -extldflags -static" -o bin/server
+        strip bin/server
+      args:
+        executable: /bin/bash
+- hosts: do
+  vars:
+    app_dir: "{{ playbook_dir }}/.."
+  
+  tasks:
+    - name: Copy binary file to server
+      ansible.builtin.copy:
+        src: "{{ app_dir }}/bin/server"
+        dest: /server
+        mode: 0500
+        force: true
+    - name: Run server
+      ansible.builtin.shell: |
+        nohup /server 1>>/var/log/mybooklist_backend.log 2>>/var/log/mybooklist_backend.error.log &
+      args:
+        executable: /bin/bash

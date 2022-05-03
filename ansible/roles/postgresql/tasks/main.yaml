@@ -1,0 +1,51 @@
+- name: Install postgresql
+  ansible.builtin.apt:
+    package:
+      - postgresql
+- name: Install python package for postgresql
+  ansible.builtin.apt:
+    package:
+      - python3-psycopg2
+    state: present
+- name: Start postgresql service & enable on startup
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: true
+- name: Config postgresql
+  become_user: postgres
+  block:      
+    - name: Create db user
+      community.postgresql.postgresql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_pw }}"
+        state: present
+    - name: Create app db
+      community.postgresql.postgresql_db:
+        name: "{{ db_name }}"
+        encoding: UTF-8
+        state: present
+    - name: Grant privs to user
+      community.postgresql.postgresql_privs:
+        database: "{{ db_name }}"
+        type: database
+        state: present
+        roles: "{{ db_user }}"
+        privs: all
+      notify: restart_postgres
+    - name: Allow md5 connection
+      community.postgresql.postgresql_pg_hba:
+        dest: "/etc/postgresql/12/main/pg_hba.conf"
+        databases: "{{ db_name }}"
+        contype: host
+        address: all
+        users: "{{ db_user }}"
+        method: md5
+        create: true
+      notify: restart_postgres
+    - name: Allow remote connection
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/12/main/postgresql.conf
+        regexp: '^listen_address'
+        line: "listen_addresses = '*'"
+      notify: restart_postgres

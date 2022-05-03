@@ -1,0 +1,23 @@
+---
+- name: Install nginx
+  ansible.builtin.apt:
+    package:
+      - nginx
+    state: present
+- name: Start nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+- name: Config nginx
+  become: true
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/default
+    force: true
+  notify: restart_nginx
+- name: Link to sites-enable
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/default
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+  notify: restart_nginx
