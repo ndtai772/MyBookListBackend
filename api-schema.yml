@@ -313,6 +313,32 @@ paths:
         401: { description: Unauthorize }
         403: { description: Forbidden }
 
+  /books:
+    get:
+      summary: List books
+      tags: [Book]
+      security: []
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+          description: |
+            search query, results will match any book that contain the search query in it info (title, author, description, etc)
+          required: false
+        - $ref: "#/components/parameters/page_size"
+        - $ref: "#/components/parameters/last_id"
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                allOf: [$ref: "#/components/schemas/list"]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/BookInfo" }
+
   /books/{id}:
     parameters:
       - name: id
@@ -355,32 +381,6 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/CommentInfo" }
         401: { description: Unauthorize }
-
-  /books/search:
-    get:
-      summary: Search books
-      tags: [Book]
-      security: []
-      parameters:
-        - name: q
-          in: query
-          schema: { type: string }
-          description: |
-            search query, results will match any book that contain the search query in it info (title, author, description, etc)
-          required: false
-        - $ref: "#/components/parameters/page_size"
-        - $ref: "#/components/parameters/last_id"
-      responses:
-        200:
-          description: Ok
-          content:
-            application/json:
-              schema:
-                allOf: [$ref: "#/components/schemas/list"]
-                properties:
-                  data:
-                    type: array
-                    items: { $ref: "#/components/schemas/BookInfo" }
 
   /bookmarks:
     post:
