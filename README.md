@@ -10,17 +10,12 @@ chmod u+x ./bin/migrate/migrate
 
 ## Missing / unusable yet
 
-| Task                        | Priority | Level  |
-| --------------------------- | -------- | ------ |
-| Integrate with frontend     | high     | medium |
-| Authentication / Login API  | high     | medium |
-| Authorization               | high     | medium |
-| Feedback API                | low      | easy   |
-| Notification mechanism      | medium   | hard   |
-| Deploy / ci-cd              | medium   | medium |
-| Views, comments, rate count | low      | hard   |
-| Log                         | low      | medium |
-| Monitoring                  | low      | hard   |
+| Task                    | Priority | Level  |
+| ----------------------- | -------- | ------ |
+| Integrate with frontend | high     | medium |
+| Notification mechanism  | medium   | hard   |
+| Views                   | low      | hard   |
+| Monitoring              | low      | hard   |
 
 ## Partial done
 - API design/docs
