@@ -1,20 +1,25 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/meilisearch/meilisearch-go"
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
 	"github.com/ndtai772/MyBookListBackend/token"
 	"github.com/ndtai772/MyBookListBackend/util"
 )
 
 type Server struct {
-	store      *db.Store
-	router     *gin.Engine
-	tokenMaker token.Maker
+	store             *db.Store
+	router            *gin.Engine
+	tokenMaker        token.Maker
+	meilisearchClient *meilisearch.Client
 }
 
 const (
@@ -27,8 +32,13 @@ func NewServer(store *db.Store) *Server {
 		panic(fmt.Errorf("cannot create JWT maker %w", err))
 	}
 
-	server := &Server{store: store, tokenMaker: tokenMaker}
+	meilisearchClient := meilisearch.NewClient(meilisearch.ClientConfig{
+		Host: "http://127.0.0.1:7700",
+	})
+
+	server := &Server{store: store, tokenMaker: tokenMaker, meilisearchClient: meilisearchClient}
 	server.setupRouter()
+	server.indexBooks()
 	return server
 }
 
@@ -56,6 +66,7 @@ func (server *Server) setupRouter() {
 
 	// Books
 	publicRoutes.GET("/books", server.listBooks)
+	publicRoutes.GET("/search", server.searchBooks)
 	authRoutes.POST("/books", unimplemented("add book"))
 	publicRoutes.GET("/books/:id", server.getBook)
 	authRoutes.PATCH("/books/:id", unimplemented("update book"))
@@ -99,4 +110,36 @@ func unimplemented(msg string) func(ctx *gin.Context) {
 
 func (server *Server) Start(address string) error {
 	return server.router.Run(address)
+}
+
+func (server *Server) indexBooks() {
+	server.meilisearchClient.Index("books").DeleteAllDocuments()
+	var wg sync.WaitGroup
+	lastID := math.MaxInt32
+	sem := make(chan int, 30)
+	for {
+		books, err := server.store.ListBooks(context.Background(), db.ListBooksParams{
+			Limit:  1000,
+			LastID: int32(lastID - 1),
+		})
+		if err != nil {
+			log.Println("db error")
+			break
+		}
+		if len(books) < 1 {
+			break
+		}
+		wg.Add(1)
+		sem <- 1
+		go func(doc interface{}) {
+			defer wg.Done()
+			if _, err := server.meilisearchClient.Index("books").AddDocuments(doc); err != nil {
+				panic(err)
+			}
+			<-sem
+		}(books)
+
+		lastID = int(books[len(books)-1].ID)
+	}
+	wg.Wait()
 }

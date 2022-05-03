@@ -1,0 +1,26 @@
+---
+- name: Add Meilisearch package
+  ansible.builtin.copy:
+    src: fury.list
+    dest: /etc/apt/sources.list.d/fury.list
+
+- name: Install Meilisearch
+  ansible.builtin.apt:
+    name: meilisearch-http
+    update_cache: true
+    state: present
+
+- name: Check if port 7700 is listening
+  wait_for:
+    port: 7700
+    delay: 5
+    timeout: 10
+    msg: "Timeout waiting for 80 to respond"
+  register: port_check
+  ignore_errors: true
+
+- name: Try to start meilisearch if not started
+  ansible.builtin.shell: |
+    nohup meilisearch 1>>/var/log/meilisearch.log 2>>/var/log/meilisearch.error.log &
+  when: port_check.failed == true
+

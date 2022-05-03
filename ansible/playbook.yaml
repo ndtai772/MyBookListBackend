@@ -30,4 +30,6 @@
               - "{{ server_name }}"
     - role: postgresql
       become: true
+    - role: meilisearch
+      become: true
 

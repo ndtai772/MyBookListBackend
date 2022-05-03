@@ -14,7 +14,7 @@ dbreload: dbdown dbup
 build:
 	GOOS=linux GOARCH=amd64 go build -o bin/server
 
-run:
+run: build
 	./bin/server
 
 deploy:
