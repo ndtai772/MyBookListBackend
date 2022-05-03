@@ -1,0 +1,59 @@
+---
+- hosts: do
+  become: true
+
+  handlers:
+    - name: Restart postgres
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted
+        enabled: true
+
+
+  tasks:
+    - name: Install postgresql
+      ansible.builtin.apt:
+        package:
+          - postgresql
+    - name: Install python package for postgresql
+      ansible.builtin.apt:
+        package:
+          - python3-psycopg2
+        state: present
+    - name: Start postgresql service
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+        enabled: true
+    - name: Config postgresql
+      become_user: postgres
+      block:      
+        - name: Create db user
+          community.postgresql.postgresql_user:
+            name: dev
+            password: "123"
+            state: present
+        - name: Create app db
+          community.postgresql.postgresql_db:
+            name: my_book_list
+            encoding: UTF-8
+            state: present
+        - name: Grant privs to user
+          community.postgresql.postgresql_privs:
+            database: my_book_list
+            type: database
+            state: present
+            roles: dev
+            privs: all
+          notify: Restart postgres
+        - name: Allow md5 connection
+          community.postgresql.postgresql_pg_hba:
+            dest: "/etc/postgresql/12/main/pg_hba.conf"
+            databases: my_book_list
+            contype: host
+            address: all
+            users: dev
+            method: md5
+            create: true
+          notify: Restart postgres
+# TODO: config listen_address at /etc/postgresql/12/main/postgresql.conf

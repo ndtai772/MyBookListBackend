@@ -6,7 +6,7 @@
   vars_files: vars.yaml
 
   tasks:
-    - name: Create new Droplet
+    - name: Remove Droplet
       community.digitalocean.digital_ocean_droplet:
         state: absent
         name: "{{ DROPLET_NAME }}"
