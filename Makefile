@@ -1,5 +1,4 @@
 DB_URL=postgresql://dev:123@localhost:5432/my_book_list?sslmode=disable
-REAL_DB_URL=postgresql://dev:123@api.mybooklist.ndtai.me:5432/my_book_list?sslmode=disable
 MIGRATE=./bin/migrate/migrate
 
 dbup:
