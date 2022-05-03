@@ -16,3 +16,13 @@ build:
 
 run:
 	./bin/server
+
+deploy:
+	cd ansible && ansible-playbook deploy.yaml -vv
+
+svup:
+	cd ansible && ansible-playbook base/up.yaml -vv
+	cd ansible && ansible-playbook playbook.yaml -vv
+
+svdown:
+	cd ansible && ansible-playbook base/down.yaml -vv
