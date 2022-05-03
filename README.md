@@ -1,5 +1,7 @@
 # MyBookListBackend
 
+Live demo: https://api.mybooklist.ndtai.me
+
 ## For dev
 Get Go-migrate (for database migrations management)
 ``` bash
