@@ -9,25 +9,74 @@ import (
 	"context"
 )
 
+const listBookmarkedBooksByAccountId = `-- name: ListBookmarkedBooksByAccountId :many
+SELECT books.id, books.title, books.author, books.language, books.publisher, books.pages, books.cover_url
+FROM bookmarks
+JOIN books on books.id = bookmarks.book_id
+WHERE bookmarks.created_by = $1
+ORDER BY bookmarks.id DESC
+`
+
+type ListBookmarkedBooksByAccountIdRow struct {
+	ID        int32  `json:"id"`
+	Title     string `json:"title"`
+	Author    string `json:"author"`
+	Language  string `json:"language"`
+	Publisher string `json:"publisher"`
+	Pages     int16  `json:"pages"`
+	CoverUrl  string `json:"cover_url"`
+}
+
+func (q *Queries) ListBookmarkedBooksByAccountId(ctx context.Context, createdBy int32) ([]ListBookmarkedBooksByAccountIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, listBookmarkedBooksByAccountId, createdBy)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListBookmarkedBooksByAccountIdRow{}
+	for rows.Next() {
+		var i ListBookmarkedBooksByAccountIdRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Author,
+			&i.Language,
+			&i.Publisher,
+			&i.Pages,
+			&i.CoverUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listBooksByCategoryId = `-- name: ListBooksByCategoryId :many
-SELECT books.id, books.title, books.author, books.description, books.modified_at, books.created_at
+SELECT books.id, books.title, books.author, books.description, books.year, books.language, books.publisher, books.pages, books.cover_url, books.created_at
 FROM books
 LEFT JOIN book_category
-ON  book_category.category_id = $3
+ON  book_category.category_id = $2
     AND book_category.book_id = books.id
-ORDER BY books.id
+WHERE NOT id > $3
+ORDER BY books.id DESC
 LIMIT $1
-OFFSET $2
 `
 
 type ListBooksByCategoryIdParams struct {
 	Limit      int32 `json:"limit"`
-	Offset     int32 `json:"offset"`
 	CategoryID int32 `json:"category_id"`
+	LastID     int32 `json:"last_id"`
 }
 
 func (q *Queries) ListBooksByCategoryId(ctx context.Context, arg ListBooksByCategoryIdParams) ([]Book, error) {
-	rows, err := q.db.QueryContext(ctx, listBooksByCategoryId, arg.Limit, arg.Offset, arg.CategoryID)
+	rows, err := q.db.QueryContext(ctx, listBooksByCategoryId, arg.Limit, arg.CategoryID, arg.LastID)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +89,11 @@ func (q *Queries) ListBooksByCategoryId(ctx context.Context, arg ListBooksByCate
 			&i.Title,
 			&i.Author,
 			&i.Description,
-			&i.ModifiedAt,
+			&i.Year,
+			&i.Language,
+			&i.Publisher,
+			&i.Pages,
+			&i.CoverUrl,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err

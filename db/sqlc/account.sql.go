@@ -11,45 +11,44 @@ import (
 
 const createAccount = `-- name: CreateAccount :one
 INSERT INTO accounts (
-    username,
+    name,
     email,
-    encoded_hash,
+    hashed_password,
     is_admin
 ) VALUES (
     $1, $2, $3, $4
-) RETURNING id, username, email, encoded_hash, avatar_uri, is_admin, modified_at, created_at
+) RETURNING id, name, email, hashed_password, avatar_url, is_admin, created_at
 `
 
 type CreateAccountParams struct {
-	Username    string `json:"username"`
-	Email       string `json:"email"`
-	EncodedHash string `json:"encoded_hash"`
-	IsAdmin     bool   `json:"is_admin"`
+	Name           string `json:"name"`
+	Email          string `json:"email"`
+	HashedPassword string `json:"hashed_password"`
+	IsAdmin        bool   `json:"is_admin"`
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error) {
 	row := q.db.QueryRowContext(ctx, createAccount,
-		arg.Username,
+		arg.Name,
 		arg.Email,
-		arg.EncodedHash,
+		arg.HashedPassword,
 		arg.IsAdmin,
 	)
 	var i Account
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Name,
 		&i.Email,
-		&i.EncodedHash,
-		&i.AvatarUri,
+		&i.HashedPassword,
+		&i.AvatarUrl,
 		&i.IsAdmin,
-		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getAccount = `-- name: GetAccount :one
-SELECT id, username, email, encoded_hash, avatar_uri, is_admin, modified_at, created_at
+SELECT id, name, email, hashed_password, avatar_url, is_admin, created_at
 FROM accounts
 WHERE id = $1 LIMIT 1
 `
@@ -59,84 +58,32 @@ func (q *Queries) GetAccount(ctx context.Context, id int32) (Account, error) {
 	var i Account
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Name,
 		&i.Email,
-		&i.EncodedHash,
-		&i.AvatarUri,
+		&i.HashedPassword,
+		&i.AvatarUrl,
 		&i.IsAdmin,
-		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
-const listAccounts = `-- name: ListAccounts :many
-SELECT id, username, email, encoded_hash, avatar_uri, is_admin, modified_at, created_at
+const getAccountByEmail = `-- name: GetAccountByEmail :one
+SELECT id, name, email, hashed_password, avatar_url, is_admin, created_at
 FROM accounts
-LIMIT $1
-OFFSET $2
+WHERE email = $1 LIMIT 1
 `
 
-type ListAccountsParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
-
-func (q *Queries) ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error) {
-	rows, err := q.db.QueryContext(ctx, listAccounts, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Account{}
-	for rows.Next() {
-		var i Account
-		if err := rows.Scan(
-			&i.ID,
-			&i.Username,
-			&i.Email,
-			&i.EncodedHash,
-			&i.AvatarUri,
-			&i.IsAdmin,
-			&i.ModifiedAt,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const updateAccount = `-- name: UpdateAccount :one
-UPDATE accounts
-SET encoded_hash = $2
-WHERE id = $1
-RETURNING id, username, email, encoded_hash, avatar_uri, is_admin, modified_at, created_at
-`
-
-type UpdateAccountParams struct {
-	ID          int32  `json:"id"`
-	EncodedHash string `json:"encoded_hash"`
-}
-
-func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error) {
-	row := q.db.QueryRowContext(ctx, updateAccount, arg.ID, arg.EncodedHash)
+func (q *Queries) GetAccountByEmail(ctx context.Context, email string) (Account, error) {
+	row := q.db.QueryRowContext(ctx, getAccountByEmail, email)
 	var i Account
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Name,
 		&i.Email,
-		&i.EncodedHash,
-		&i.AvatarUri,
+		&i.HashedPassword,
+		&i.AvatarUrl,
 		&i.IsAdmin,
-		&i.ModifiedAt,
 		&i.CreatedAt,
 	)
 	return i, err

@@ -1,20 +1,29 @@
 package api
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
+	"github.com/ndtai772/MyBookListBackend/token"
+	"github.com/ndtai772/MyBookListBackend/util"
 )
 
 type Server struct {
-	store  *db.Store
-	router *gin.Engine
+	store      *db.Store
+	router     *gin.Engine
+	tokenMaker token.Maker
 }
 
 func NewServer(store *db.Store) *Server {
-	server := &Server{store: store}
+	tokenMaker, err := token.NewJWTMaker(util.RandomString(32))
+	if err != nil {
+		panic(fmt.Errorf("cannot create JWT maker %w", err))
+	}
+
+	server := &Server{store: store, tokenMaker: tokenMaker}
 	server.setupRouter()
 	return server
 }
@@ -23,41 +32,36 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	publicRoutes := router.Group("/")
-	authRoutes := router.Group("/")
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
+	//Auth
+	publicRoutes.POST("/auth/login", server.login)
+	publicRoutes.POST("/auth/refresh", server.renewAccessToken)
 
 	// Accounts
 	publicRoutes.POST("/accounts", server.createAccount)
 	publicRoutes.GET("/accounts/:id", server.getAccount)
-	authRoutes.PATCH("/accounts/:id", unimplemented("update account info"))
-	authRoutes.DELETE("/accounts/:id", unimplemented("inactive account"))
-	authRoutes.GET("/accounts/:id/feedbacks", unimplemented("get personal feedbacks"))
+	authRoutes.PATCH("/accounts/:id", unimplemented("update account"))
 	authRoutes.GET("/accounts/:id/bookmarks", server.listPersonalBookmarks)
-	authRoutes.GET("/accounts/:id/rates", server.listPersonalRates)
-	authRoutes.GET("/accounts/:id/comments", server.listPersonalComments)
-
-	// Feedbacks
-	authRoutes.GET("/feedbacks", unimplemented("list all user feedbacks"))
-	authRoutes.POST("/feedbacks", unimplemented("create feedback"))
-	authRoutes.GET("/feedbacks/:id", unimplemented("get feedback by id"))
-	authRoutes.PATCH("/feedbacks/:id", unimplemented("update feedback"))
-	authRoutes.DELETE("/feedbacks/:id", unimplemented("delete a feedback"))
+	authRoutes.GET("/accounts/:id/rates", unimplemented("list personal rates"))
+	authRoutes.GET("/accounts/:id/comments", unimplemented("list personal comments"))
 
 	// Books
 	publicRoutes.GET("/books", server.listBooks)
-	authRoutes.POST("/books", server.createBook)
-	authRoutes.GET("/books/:id", server.getBook)
-	authRoutes.PATCH("/books/:id", server.updateBook)
-	authRoutes.DELETE("/books/:id", server.deleteBook)
-	authRoutes.GET("/books/:id/rates", server.listBookRates)
-	authRoutes.GET("/books/:id/comments", server.listBookComments)
+	authRoutes.POST("/books", unimplemented("add book"))
+	publicRoutes.GET("/books/:id", server.getBook)
+	authRoutes.PATCH("/books/:id", unimplemented("update book"))
+	authRoutes.DELETE("/books/:id", unimplemented("remove a book"))
+	publicRoutes.GET("/books/:id/rates", unimplemented("list a book's rates"))
+	publicRoutes.GET("/books/:id/comments", server.listBookComments)
 
 	// Categories
-	authRoutes.GET("/categories", server.listCategories)
+	publicRoutes.GET("/categories", server.listCategories)
 	authRoutes.POST("/categories", server.createCategory)
-	// authRoutes.GET("/categories/:id", unimplemented("get category by id"))
+	publicRoutes.GET("/categories/:id", unimplemented("get category by id"))
 	authRoutes.PATCH("/categories/:id", unimplemented("update category info"))
 	authRoutes.DELETE("/categories/:id", unimplemented("delete a category"))
-	authRoutes.GET("/categories/:id/books", server.listBooksByCategory)
+	publicRoutes.GET("/categories/:id/books", server.listBooksByCategory)
 
 	// Bookmarks
 	authRoutes.POST("/bookmarks", server.createBookmark)

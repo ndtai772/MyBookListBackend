@@ -10,14 +10,13 @@ import (
 )
 
 type Account struct {
-	ID          int32     `json:"id"`
-	Username    string    `json:"username"`
-	Email       string    `json:"email"`
-	EncodedHash string    `json:"encoded_hash"`
-	AvatarUri   string    `json:"avatar_uri"`
-	IsAdmin     bool      `json:"is_admin"`
-	ModifiedAt  time.Time `json:"modified_at"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID             int32     `json:"id"`
+	Name           string    `json:"name"`
+	Email          string    `json:"email"`
+	HashedPassword string    `json:"hashed_password"`
+	AvatarUrl      string    `json:"avatar_url"`
+	IsAdmin        bool      `json:"is_admin"`
+	CreatedAt      time.Time `json:"created_at"`
 }
 
 type Book struct {
@@ -25,7 +24,11 @@ type Book struct {
 	Title       string    `json:"title"`
 	Author      string    `json:"author"`
 	Description string    `json:"description"`
-	ModifiedAt  time.Time `json:"modified_at"`
+	Year        int16     `json:"year"`
+	Language    string    `json:"language"`
+	Publisher   string    `json:"publisher"`
+	Pages       int16     `json:"pages"`
+	CoverUrl    string    `json:"cover_url"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
@@ -35,6 +38,34 @@ type BookCategory struct {
 	CreatedAt  time.Time `json:"created_at"`
 }
 
+type BookDetail struct {
+	ID            int32         `json:"id"`
+	Title         string        `json:"title"`
+	Author        string        `json:"author"`
+	Description   string        `json:"description"`
+	Year          int16         `json:"year"`
+	Language      string        `json:"language"`
+	Publisher     string        `json:"publisher"`
+	Pages         int16         `json:"pages"`
+	CoverUrl      string        `json:"cover_url"`
+	CreatedAt     time.Time     `json:"created_at"`
+	Categories    []byte        `json:"categories"`
+	CommentCount  sql.NullInt64 `json:"comment_count"`
+	BookmarkCount sql.NullInt64 `json:"bookmark_count"`
+	RateCount     sql.NullInt64 `json:"rate_count"`
+	RateAvg       int32         `json:"rate_avg"`
+	Rate1         sql.NullInt64 `json:"rate_1"`
+	Rate2         sql.NullInt64 `json:"rate_2"`
+	Rate3         sql.NullInt64 `json:"rate_3"`
+	Rate4         sql.NullInt64 `json:"rate_4"`
+	Rate5         sql.NullInt64 `json:"rate_5"`
+	Rate6         sql.NullInt64 `json:"rate_6"`
+	Rate7         sql.NullInt64 `json:"rate_7"`
+	Rate8         sql.NullInt64 `json:"rate_8"`
+	Rate9         sql.NullInt64 `json:"rate_9"`
+	Rate10        sql.NullInt64 `json:"rate_10"`
+}
+
 type Bookmark struct {
 	ID        int32     `json:"id"`
 	BookID    int32     `json:"book_id"`
@@ -42,40 +73,56 @@ type Bookmark struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type BookmarkCount struct {
+	BookID int32 `json:"book_id"`
+	Count  int64 `json:"count"`
+}
+
 type Category struct {
 	ID          int32     `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
-	ModifiedAt  time.Time `json:"modified_at"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-type Comment struct {
-	ID         int32     `json:"id"`
-	Content    string    `json:"content"`
-	BookID     int32     `json:"book_id"`
-	CreatedBy  int32     `json:"created_by"`
-	ModifiedAt time.Time `json:"modified_at"`
-	CreatedAt  time.Time `json:"created_at"`
+type CategorySummary struct {
+	BookID     int32  `json:"book_id"`
+	Categories []byte `json:"categories"`
 }
 
-type Feedback struct {
-	ID           int32          `json:"id"`
-	Content      string         `json:"content"`
-	CreatedBy    int32          `json:"created_by"`
-	IsViewed     bool           `json:"is_viewed"`
-	IsProcessing bool           `json:"is_processing"`
-	IsResolved   bool           `json:"is_resolved"`
-	Message      sql.NullString `json:"message"`
-	ModifiedAt   time.Time      `json:"modified_at"`
-	CreatedAt    time.Time      `json:"created_at"`
+type Comment struct {
+	ID        int32     `json:"id"`
+	Content   string    `json:"content"`
+	BookID    int32     `json:"book_id"`
+	CreatedBy int32     `json:"created_by"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type CommentCount struct {
+	BookID int32 `json:"book_id"`
+	Count  int64 `json:"count"`
 }
 
 type Rate struct {
-	ID         int32     `json:"id"`
-	BookID     int32     `json:"book_id"`
-	CreatedBy  int32     `json:"created_by"`
-	RateValue  int32     `json:"rate_value"`
-	ModifiedAt time.Time `json:"modified_at"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID        int32     `json:"id"`
+	BookID    int32     `json:"book_id"`
+	CreatedBy int32     `json:"created_by"`
+	RateValue int32     `json:"rate_value"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type RateCount struct {
+	BookID  int32 `json:"book_id"`
+	Count   int64 `json:"count"`
+	RateSum int64 `json:"rate_sum"`
+	Rate1   int64 `json:"rate_1"`
+	Rate2   int64 `json:"rate_2"`
+	Rate3   int64 `json:"rate_3"`
+	Rate4   int64 `json:"rate_4"`
+	Rate5   int64 `json:"rate_5"`
+	Rate6   int64 `json:"rate_6"`
+	Rate7   int64 `json:"rate_7"`
+	Rate8   int64 `json:"rate_8"`
+	Rate9   int64 `json:"rate_9"`
+	Rate10  int64 `json:"rate_10"`
 }

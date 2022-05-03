@@ -1,1 +1,0 @@
-CREATE DATABASE my_book_list;

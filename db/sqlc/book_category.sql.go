@@ -29,18 +29,3 @@ func (q *Queries) CreateBookCategory(ctx context.Context, arg CreateBookCategory
 	err := row.Scan(&i.BookID, &i.CategoryID, &i.CreatedAt)
 	return i, err
 }
-
-const deleteBookCategory = `-- name: DeleteBookCategory :exec
-DELETE FROM book_category
-WHERE book_id = $1 AND category_id = $2
-`
-
-type DeleteBookCategoryParams struct {
-	BookID     int32 `json:"book_id"`
-	CategoryID int32 `json:"category_id"`
-}
-
-func (q *Queries) DeleteBookCategory(ctx context.Context, arg DeleteBookCategoryParams) error {
-	_, err := q.db.ExecContext(ctx, deleteBookCategory, arg.BookID, arg.CategoryID)
-	return err
-}

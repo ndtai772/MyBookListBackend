@@ -23,17 +23,9 @@ RETURNING *;
 DELETE FROM rates
 WHERE id = $1;
 
--- name: ListRatesByAccountId :many
-SELECT *
-FROM rates
-WHERE created_by = $3
-LIMIT $1
-OFFSET $2;
-
--- name: ListRatesByBookId :many
-SELECT *
-FROM rates
-WHERE book_id = $3
-ORDER BY id DESC
-LIMIT $1
-OFFSET $2;
+-- -- name: ListRatesByAccountId :many
+-- SELECT *
+-- FROM rates
+-- WHERE created_by = $3
+-- LIMIT $1
+-- OFFSET $2;

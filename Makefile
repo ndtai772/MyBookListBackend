@@ -1,20 +1,18 @@
 DB_URL=postgresql://dev:123@localhost:5432/my_book_list?sslmode=disable
 MIGRATE=./bin/migrate/migrate
 
-up:
-	docker-compose up
-
-createdb:
-	docker exec backend-db-1 createdb --username=dev --owner=dev my_book_list
-
-migrateup:
+dbup:
+	docker-compose up -d
+	@sleep 3
 	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose up
 
-migrateup1:
-	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose up 1
+dbdown:
+	docker-compose down -v
 
-migratedown:
-	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose down
+dbreload: dbdown dbup
 
-migratedown1:
-	$(MIGRATE) -path db/migrations -database "$(DB_URL)" -verbose down 1
+build:
+	go build -o bin/server main.go
+
+run:
+	./bin/server

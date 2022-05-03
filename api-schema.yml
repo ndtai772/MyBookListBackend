@@ -1,0 +1,499 @@
+openapi: "3.0.2"
+info:
+  title: MyBookList API
+  version: "0.1.0"
+servers:
+  - url: https://api.mybooklist.ndtai.me/v1
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    page_size:
+      name: page_size
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100 }
+      required: false
+    last_id:
+      name: last_id
+      in: query
+      schema: { type: integer, minimum: 0 }
+      required: false
+    account_id:
+      name: account_id
+      in: query
+      schema: { type: integer }
+      required: true
+
+  requestBodies:
+    Login:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            required: [email, password]
+            properties:
+              email: { type: string, format: email }
+              password: { type: string, format: password }
+    AccountCreate:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            required: [name, password, email]
+            properties:
+              name: { $ref: "#/components/schemas/name" }
+              password: { type: string, format: password }
+              email: { type: string, format: email }
+    AccountUpdate:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            minProperties: 1
+            properties:
+              name: { $ref: "#/components/schemas/name" }
+              password: { type: string, pattern: password }
+    BookmarkCreate:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            required: [book_id]
+            properties:
+              book_id: { type: integer }
+    RateCreate:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            required: [score]
+            properties:
+              score: { type: integer, maximum: 10, minimum: 1 }
+    RateUpdate:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            required: [score]
+            properties:
+              score: { type: integer, maximum: 10, minimum: 1 }
+    CommentCreate:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            required: [book_id, content]
+            properties:
+              book_id: { type: integer }
+              content: { type: string }
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            properties:
+              code: { type: number }
+              message: { type: string }
+    InvalidRequestSchema:
+      description: Invalid request scheme
+      content:
+        application/json:
+          schema:
+            properties:
+              message: { type: string }
+
+  schemas:
+    name:
+      type: string
+      maxLength: 255
+    list:
+      properties:
+        page_size: { type: integer }
+        last_id: { type: integer }
+
+    AccountInfo:
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+        avatar_url: { type: string, format: uri }
+        is_admin: { type: boolean }
+        created_at: { type: string, format: timestamp }
+    AccountBrief:
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        is_admin: { type: boolean }
+        avatar: { type: string, format: uri }
+    BookInfo:
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        author: { type: string }
+        description: { type: string }
+        rate_avg: { type: number, format: float }
+        rate_count: { type: integer }
+        comment_count: { type: integer }
+        categories:
+          type: array
+          items: { type: integer }
+        created_at: { type: string, format: timestamp }
+    CategoryBrief:
+      properties:
+        id: { type: integer }
+        name: { type: string }
+    CategoryInfo:
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        created_at: { type: string, format: timestamp }
+    BookmarkInfo:
+      properties:
+        id: { type: integer }
+        book: { $ref: "#/components/schemas/BookInfo" }
+        kind:
+          enum:
+            - reading
+            - plan_to_read
+            - read
+        created_at: { type: string, format: timestamp }
+    FeedbackInfo:
+      properties:
+        id: { type: integer }
+        content: { type: string }
+        feedback_status: { enum: [processing, resolved, not_resolved] }
+        message: { type: string }
+        created_by: { $ref: "#/components/schemas/AccountBrief" }
+        created_at: { type: string, format: timestamp }
+    RateInfo:
+      properties:
+        id: { type: integer }
+        score: { type: number, maximum: 5, minimum: 1 }
+        created_by: { $ref: "#/components/schemas/AccountBrief" }
+
+        created_at: { type: string, format: timestamp }
+    CommentInfo:
+      properties:
+        id: { type: integer }
+        book_id: { type: integer }
+        content: { type: string }
+        created_by: { $ref: "#/components/schemas/AccountBrief" }
+        created_at: { type: string, format: timestamp }
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/Login" }
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                properties:
+                  access_token: { type: string, format: JWT }
+                  refresh_token: { type: string, format: JWT }
+        400: { $ref: "#/components/responses/BadRequest" }
+        422: { $ref: "#/components/responses/InvalidRequestSchema" }
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh token
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                refresh_token: { type: string, format: JWT }
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                properties:
+                  access_token: { type: string, format: JWT }
+        400: { $ref: "#/components/responses/BadRequest" }
+        422: { $ref: "#/components/responses/InvalidRequestSchema" }
+
+  /accounts:
+    post:
+      summary: Create account
+      tags: [Account]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AccountCreate" }
+      responses:
+        204: { description: OK }
+        400: { $ref: "#/components/responses/BadRequest" }
+        422: { $ref: "#/components/responses/InvalidRequestSchema" }
+
+  /accounts/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema: { type: integer }
+        required: true
+    get:
+      summary: View account info
+      tags: [Account]
+      security: []
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AccountInfo" }
+        404: { description: NotFound }
+    patch:
+      summary: Update account
+      tags: [Account]
+      requestBody: { $ref: "#/components/requestBodies/AccountUpdate" }
+      responses:
+        204: { description: OK }
+        400: { $ref: "#/components/responses/BadRequest" }
+        401: { description: Unauthorize }
+        403: { description: Forbidden }
+        422: { $ref: "#/components/responses/InvalidRequestSchema" }
+
+  # /accounts/{id}/rates:
+  #   parameters:
+  #     - name: id
+  #       in: path
+  #       schema: { type: integer }
+  #       required: true
+  #   get:
+  #     summary: List personal rates
+  #     tags: [Rate]
+  #     responses:
+  #       200:
+  #         description: Ok
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf: [$ref: "#/components/schemas/list"]
+  #               properties:
+  #                 data:
+  #                   type: array
+  #                   items: { $ref: "#/components/schemas/RateInfo" }
+  #       401: { description: Unauthorize }
+  #       403: { description: Forbidden }
+
+  /accounts/{id}/bookmarks:
+    parameters:
+      - name: id
+        in: path
+        schema: { type: integer }
+        required: true
+    get:
+      summary: List personal bookmarks
+      tags: [Bookmark]
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/BookmarkInfo" }
+        401: { description: Unauthorize }
+        403: { description: Forbidden }
+
+  /books/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema: { type: integer }
+        required: true
+    get:
+      summary: View book info
+      tags: [Book]
+      security: []
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BookInfo" }
+        404: { description: NotFound }
+
+  /books/{id}/comments:
+    parameters:
+      - name: id
+        in: path
+        schema: { type: integer }
+        required: true
+    get:
+      summary: List comments about a book
+      tags: [Comment]
+      parameters:
+        - $ref: "#/components/parameters/page_size"
+        - $ref: "#/components/parameters/last_id"
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                allOf: [$ref: "#/components/schemas/list"]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/CommentInfo" }
+        401: { description: Unauthorize }
+
+  /books/search:
+    get:
+      summary: Search books
+      tags: [Book]
+      security: []
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+          description: |
+            search query, results will match any book that contain the search query in it info (title, author, description, etc)
+          required: false
+        - $ref: "#/components/parameters/page_size"
+        - $ref: "#/components/parameters/last_id"
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                allOf: [$ref: "#/components/schemas/list"]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/BookInfo" }
+
+  /bookmarks:
+    post:
+      summary: Bookmark a book
+      tags: [Bookmark]
+      requestBody: { $ref: "#/components/requestBodies/BookmarkCreate" }
+      responses:
+        204: { description: OK }
+        400: { $ref: "#/components/responses/BadRequest" }
+        401: { description: Unauthorize }
+        422: { $ref: "#/components/responses/InvalidRequestSchema" }
+
+  /bookmarks/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema: { type: integer }
+        required: true
+    delete:
+      summary: Remove bookmark
+      tags: [Bookmark]
+      responses:
+        204: { description: OK }
+        401: { description: Unauthorize }
+        403: { description: Forbidden }
+        404: { description: NotFound }
+
+  /rates:
+    get:
+      summary: List all personal rates
+      tags: [Rate]
+      parameters: [$ref: "#/components/parameters/account_id"]
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                allOf: [$ref: "#/components/schemas/list"]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/RateInfo" }
+        401: { description: Unauthorize }
+    post:
+      summary: Add rate
+      tags: [Rate]
+      requestBody: { $ref: "#/components/requestBodies/RateCreate" }
+      responses:
+        204: { description: OK }
+        400: { $ref: "#/components/responses/BadRequest" }
+        401: { description: Unauthorize }
+        422: { $ref: "#/components/responses/InvalidRequestSchema" }
+
+  /rates/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema: { type: integer }
+        required: true
+    get:
+      summary: View rate
+      tags: [Rate]
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RateInfo" }
+        401: { description: Unauthorize }
+        403: { description: Forbidden }
+        404: { description: NotFound }
+    patch:
+      summary: Edit rate
+      tags: [Rate]
+      requestBody: { $ref: "#/components/requestBodies/RateUpdate" }
+      responses:
+        204: { description: OK }
+        401: { description: Unauthorize }
+        403: { description: Forbidden }
+        404: { description: NotFound }
+        422: { $ref: "#/components/responses/InvalidRequestSchema" }
+    delete:
+      summary: Remove rate
+      tags: [Rate]
+      responses:
+        204: { description: OK }
+        401: { description: Unauthorize }
+        403: { description: Forbidden }
+        404: { description: NotFound }
+
+  /comments:
+    post:
+      summary: Add comment
+      tags: [Comment]
+      requestBody: { $ref: "#/components/requestBodies/RateCreate" }
+      responses:
+        204: { description: OK }
+        400: { $ref: "#/components/responses/BadRequest" }
+        401: { description: Unauthorize }
+        422: { $ref: "#/components/responses/InvalidRequestSchema" }
+
+  /comments/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema: { type: integer }
+        required: true
+    delete:
+      summary: Remove comment
+      tags: [Comment]
+      responses:
+        204: { description: OK }
+        401: { description: Unauthorize }
+        403: { description: Forbidden }
+        404: { description: NotFound }

@@ -6,13 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
+	"github.com/ndtai772/MyBookListBackend/token"
 )
 
 func (server *Server) createComment(ctx *gin.Context) {
 	var createCommentForm struct {
-		BookId      int32  `json:"book_id,omitempty"`
-		Content     string `json:"content,omitempty"`
-		CreatedBy   int32  `json:"created_by,omitempty"`
+		BookId  int32  `form:"book_id" binding:"required"`
+		Content string `form:"content" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindWith(&createCommentForm, binding.Form); err != nil {
@@ -20,10 +20,12 @@ func (server *Server) createComment(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
 	createCommentParams := db.CreateCommentParams{
-		Content: createCommentForm.Content,
-		BookID: createCommentForm.BookId,
-		CreatedBy: createCommentForm.CreatedBy,
+		Content:   createCommentForm.Content,
+		BookID:    createCommentForm.BookId,
+		CreatedBy: authPayload.AccountID,
 	}
 
 	comment, err := server.store.CreateComment(ctx, createCommentParams)
@@ -36,6 +38,7 @@ func (server *Server) createComment(ctx *gin.Context) {
 }
 
 func (server *Server) deleteComment(ctx *gin.Context) {
+	// TODO: verify ownership of the comment
 	commentId, err := parseIdUri(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))

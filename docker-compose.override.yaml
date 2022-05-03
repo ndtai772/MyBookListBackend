@@ -22,6 +22,6 @@ services:
     environment:
       - POSTGRES_USER=dev
       - POSTGRES_PASSWORD=123
-      - POSTGRES_DB=my_bbok_list
+      - POSTGRES_DB=my_book_list
     ports:
       - "5432:5432"
