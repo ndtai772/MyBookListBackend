@@ -1,4 +1,5 @@
 DB_URL=postgresql://dev:123@localhost:5432/my_book_list?sslmode=disable
+REAL_DB_URL=postgresql://dev:123@api.mybooklist.ndtai.me:5432/my_book_list?sslmode=disable
 MIGRATE=./bin/migrate/migrate
 
 dbup:
@@ -12,7 +13,7 @@ dbdown:
 dbreload: dbdown dbup
 
 build:
-	go build -o bin/server main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/server
 
 run:
 	./bin/server
