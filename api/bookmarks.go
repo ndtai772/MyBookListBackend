@@ -33,6 +33,8 @@ func (server *Server) createBookmark(ctx *gin.Context) {
 		return
 	}
 
+	server.updateBookIndex(bookmark.BookID)
+
 	ctx.JSON(http.StatusOK, bookmark)
 }
 

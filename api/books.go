@@ -11,32 +11,28 @@ import (
 )
 
 func (server *Server) listBooks(ctx *gin.Context) {
-	page_size, last_id, err := parsePaginateQuery(ctx)
-	if err != nil {
+	var req struct {
+		Limit  int    `form:"page_size,default=50"`
+		Offset int    `form:"offset,default=0"`
+		Query  string `form:"q"`
+	}
+
+	if err := ctx.ShouldBindWith(&req, binding.Query); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	args := db.ListBooksParams{
-		Limit:  page_size,
-		LastID: last_id,
-	}
+	q, _ := url.QueryUnescape(req.Query)
 
-	books, err := server.store.ListBooks(ctx, args)
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
-
-	for i := range books {
-		books[i].CoverUrl = "http://libgen.rs/covers/" + books[i].CoverUrl
-	}
+	res, _ := server.bookIndex.Search(q, &meilisearch.SearchRequest{
+		Limit:  int64(req.Limit),
+		Offset: int64(req.Offset),
+	})
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"data":      books,
-		"page_size": page_size,
-		"last_id":   books[len(books)-1].ID,
+		"data":   res.Hits,
+		"offset": req.Offset,
+		"page_size":  req.Limit,
 	})
 }
 
@@ -54,7 +50,7 @@ func (server *Server) searchBooks(ctx *gin.Context) {
 
 	q, _ := url.QueryUnescape(req.Query)
 
-	res, _ := server.meilisearchClient.Index("books").Search(q, &meilisearch.SearchRequest{
+	res, _ := server.bookIndex.Search(q, &meilisearch.SearchRequest{
 		Limit:  int64(req.Limit),
 		Offset: int64(req.Offset),
 	})

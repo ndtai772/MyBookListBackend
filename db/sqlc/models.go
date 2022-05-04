@@ -48,7 +48,7 @@ type BookDetail struct {
 	Pages         int16     `json:"pages"`
 	CoverUrl      string    `json:"cover_url"`
 	CreatedAt     time.Time `json:"created_at"`
-	Categories    []byte    `json:"categories"`
+	Categories    string    `json:"categories"`
 	CommentCount  int64     `json:"comment_count"`
 	BookmarkCount int64     `json:"bookmark_count"`
 	RateCount     int64     `json:"rate_count"`

@@ -16,8 +16,13 @@ SELECT *
 FROM book_detail
 WHERE id = $1 LIMIT 1;
 
+-- name: GetBookBrief :one
+SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum
+FROM book_detail
+WHERE id = $1 LIMIT 1;
+
 -- name: ListBooks :many
-SELECT id, title, author, language, cover_url, created_at, categories, comment_count, bookmark_count, rate_count, rate_sum
+SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum
 FROM book_detail
 WHERE NOT id > @last_id
 ORDER BY id DESC

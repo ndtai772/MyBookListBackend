@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,22 +12,25 @@ import (
 
 func (server *Server) createRate(ctx *gin.Context) {
 	var createRateForm struct {
-		score  int32 `form:"score" binding:"required"`
-		bookId int32 `form:"book_id" binding:"required"`
+		Score  int32 `form:"score" binding:"required"`
+		BookID int32 `form:"book_id" binding:"required"`
 	}
-
-	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
 	if err := ctx.ShouldBindWith(&createRateForm, binding.Form); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
+	log.Println(createRateForm)
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
 	createRateParams := db.CreateRateParams{
-		BookID:    createRateForm.bookId,
+		BookID:    createRateForm.BookID,
 		CreatedBy: authPayload.AccountID,
-		RateValue: createRateForm.score,
+		RateValue: createRateForm.Score,
 	}
+
 
 	rate, err := server.store.CreateRate(ctx, createRateParams)
 
@@ -34,6 +38,8 @@ func (server *Server) createRate(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
+	server.updateBookIndex(createRateForm.BookID)
 
 	ctx.JSON(http.StatusOK, rate)
 }
@@ -64,6 +70,8 @@ func (server *Server) updateRate(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
+	server.updateBookIndex(rate.BookID)
 
 	ctx.JSON(http.StatusOK, rate)
 }

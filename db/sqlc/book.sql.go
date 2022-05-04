@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"time"
 )
 
 const createBook = `-- name: CreateBook :one
@@ -99,8 +98,45 @@ func (q *Queries) GetBook(ctx context.Context, id int32) (BookDetail, error) {
 	return i, err
 }
 
+const getBookBrief = `-- name: GetBookBrief :one
+SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum
+FROM book_detail
+WHERE id = $1 LIMIT 1
+`
+
+type GetBookBriefRow struct {
+	ID            int32  `json:"id"`
+	Title         string `json:"title"`
+	Author        string `json:"author"`
+	Publisher     string `json:"publisher"`
+	CoverUrl      string `json:"cover_url"`
+	Categories    string `json:"categories"`
+	CommentCount  int64  `json:"comment_count"`
+	BookmarkCount int64  `json:"bookmark_count"`
+	RateCount     int64  `json:"rate_count"`
+	RateSum       int64  `json:"rate_sum"`
+}
+
+func (q *Queries) GetBookBrief(ctx context.Context, id int32) (GetBookBriefRow, error) {
+	row := q.db.QueryRowContext(ctx, getBookBrief, id)
+	var i GetBookBriefRow
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Author,
+		&i.Publisher,
+		&i.CoverUrl,
+		&i.Categories,
+		&i.CommentCount,
+		&i.BookmarkCount,
+		&i.RateCount,
+		&i.RateSum,
+	)
+	return i, err
+}
+
 const listBooks = `-- name: ListBooks :many
-SELECT id, title, author, language, cover_url, created_at, categories, comment_count, bookmark_count, rate_count, rate_sum
+SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum
 FROM book_detail
 WHERE NOT id > $2
 ORDER BY id DESC
@@ -113,17 +149,16 @@ type ListBooksParams struct {
 }
 
 type ListBooksRow struct {
-	ID            int32     `json:"id"`
-	Title         string    `json:"title"`
-	Author        string    `json:"author"`
-	Language      string    `json:"language"`
-	CoverUrl      string    `json:"cover_url"`
-	CreatedAt     time.Time `json:"created_at"`
-	Categories    []byte    `json:"categories"`
-	CommentCount  int64     `json:"comment_count"`
-	BookmarkCount int64     `json:"bookmark_count"`
-	RateCount     int64     `json:"rate_count"`
-	RateSum       int64     `json:"rate_sum"`
+	ID            int32  `json:"id"`
+	Title         string `json:"title"`
+	Author        string `json:"author"`
+	Publisher     string `json:"publisher"`
+	CoverUrl      string `json:"cover_url"`
+	Categories    string `json:"categories"`
+	CommentCount  int64  `json:"comment_count"`
+	BookmarkCount int64  `json:"bookmark_count"`
+	RateCount     int64  `json:"rate_count"`
+	RateSum       int64  `json:"rate_sum"`
 }
 
 func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBooksRow, error) {
@@ -139,9 +174,8 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBoo
 			&i.ID,
 			&i.Title,
 			&i.Author,
-			&i.Language,
+			&i.Publisher,
 			&i.CoverUrl,
-			&i.CreatedAt,
 			&i.Categories,
 			&i.CommentCount,
 			&i.BookmarkCount,

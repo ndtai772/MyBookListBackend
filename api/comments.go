@@ -34,6 +34,8 @@ func (server *Server) createComment(ctx *gin.Context) {
 		return
 	}
 
+	server.updateBookIndex(comment.BookID)
+
 	ctx.JSON(http.StatusOK, comment)
 }
 

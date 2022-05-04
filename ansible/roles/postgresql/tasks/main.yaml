@@ -20,6 +20,10 @@
         name: "{{ db_user }}"
         password: "{{ db_pw }}"
         state: present
+    - name: Drop db if exists
+      community.postgresql.postgresql_db:
+        name: "{{ db_name }}"
+        state: absent
     - name: Create app db
       community.postgresql.postgresql_db:
         name: "{{ db_name }}"

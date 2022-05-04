@@ -48,6 +48,30 @@ func (q *Queries) DeleteRate(ctx context.Context, id int32) error {
 	return err
 }
 
+const getPersonalRateOfABook = `-- name: GetPersonalRateOfABook :one
+SELECT id, book_id, created_by, rate_value, created_at
+FROM rates
+WHERE created_by = $1 AND book_id = $2
+`
+
+type GetPersonalRateOfABookParams struct {
+	CreatedBy int32 `json:"created_by"`
+	BookID    int32 `json:"book_id"`
+}
+
+func (q *Queries) GetPersonalRateOfABook(ctx context.Context, arg GetPersonalRateOfABookParams) (Rate, error) {
+	row := q.db.QueryRowContext(ctx, getPersonalRateOfABook, arg.CreatedBy, arg.BookID)
+	var i Rate
+	err := row.Scan(
+		&i.ID,
+		&i.BookID,
+		&i.CreatedBy,
+		&i.RateValue,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getRate = `-- name: GetRate :one
 SELECT id, book_id, created_by, rate_value, created_at
 FROM rates

@@ -34,10 +34,16 @@
       ansible.builtin.stat:
         path: "{{ pid_path }}"
       register: pid_data
+
     - name: Kill the old server
       ansible.builtin.shell:
         kill $(cat {{ pid_path }})
+        rm -rf {{ pid_path }}
       when: pid_data.stat.exists
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+
     - name: Run new server
       ansible.builtin.shell: |
         nohup /server 1>>/var/log/mybooklist_backend.log 2>>/var/log/mybooklist_backend.error.log &
