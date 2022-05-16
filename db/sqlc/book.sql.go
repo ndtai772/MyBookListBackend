@@ -99,7 +99,7 @@ func (q *Queries) GetBook(ctx context.Context, id int32) (BookDetail, error) {
 }
 
 const getBookBrief = `-- name: GetBookBrief :one
-SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum
+SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum, pages
 FROM book_detail
 WHERE id = $1 LIMIT 1
 `
@@ -115,6 +115,7 @@ type GetBookBriefRow struct {
 	BookmarkCount int64  `json:"bookmark_count"`
 	RateCount     int64  `json:"rate_count"`
 	RateSum       int64  `json:"rate_sum"`
+	Pages         int16  `json:"pages"`
 }
 
 func (q *Queries) GetBookBrief(ctx context.Context, id int32) (GetBookBriefRow, error) {
@@ -131,12 +132,13 @@ func (q *Queries) GetBookBrief(ctx context.Context, id int32) (GetBookBriefRow, 
 		&i.BookmarkCount,
 		&i.RateCount,
 		&i.RateSum,
+		&i.Pages,
 	)
 	return i, err
 }
 
 const listBooks = `-- name: ListBooks :many
-SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum
+SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum, pages
 FROM book_detail
 WHERE NOT id > $2
 ORDER BY id DESC
@@ -159,6 +161,7 @@ type ListBooksRow struct {
 	BookmarkCount int64  `json:"bookmark_count"`
 	RateCount     int64  `json:"rate_count"`
 	RateSum       int64  `json:"rate_sum"`
+	Pages         int16  `json:"pages"`
 }
 
 func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBooksRow, error) {
@@ -181,6 +184,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBoo
 			&i.BookmarkCount,
 			&i.RateCount,
 			&i.RateSum,
+			&i.Pages,
 		); err != nil {
 			return nil, err
 		}

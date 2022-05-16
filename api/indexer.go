@@ -22,6 +22,7 @@ type BookBrief struct {
 	BookmarkCount int64    `json:"bookmark_count"`
 	RateCount     int64    `json:"rate_count"`
 	RateSum       int64    `json:"rate_sum"`
+	Pages         int64    `json:"pages"`
 }
 
 func toBookBrief(server *Server, book db.ListBooksRow) BookBrief {
@@ -45,6 +46,7 @@ func toBookBrief(server *Server, book db.ListBooksRow) BookBrief {
 		BookmarkCount: book.BookmarkCount,
 		RateCount:     book.RateCount,
 		RateSum:       book.RateSum,
+		Pages:         int64(book.Pages),
 	}
 }
 
