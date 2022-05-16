@@ -63,10 +63,10 @@ func (server *Server) login(ctx *gin.Context) {
 
 func (server *Server) renewAccessToken(ctx *gin.Context) {
 	var req struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
+		RefreshToken string `form:"refresh_token" binding:"required"`
 	}
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindWith(&req, binding.Form); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
