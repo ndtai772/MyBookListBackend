@@ -34,76 +34,13 @@ components:
       schema: { type: integer }
       required: true
 
-  requestBodies:
-    Login:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            required: [email, password]
-            properties:
-              email: { type: string, format: email }
-              password: { type: string, format: password }
-    AccountCreate:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            required: [name, password, email]
-            properties:
-              name: { $ref: "#/components/schemas/name" }
-              password: { type: string, format: password }
-              email: { type: string, format: email }
-    AccountUpdate:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            minProperties: 1
-            properties:
-              name: { $ref: "#/components/schemas/name" }
-              password: { type: string, pattern: password }
-    BookmarkCreate:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            required: [book_id]
-            properties:
-              book_id: { type: integer }
-    RateCreate:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            required: [score]
-            properties:
-              score: { type: integer, maximum: 10, minimum: 1 }
-              book_id: { type: integer }
-    RateUpdate:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            required: [score]
-            properties:
-              score: { type: integer, maximum: 10, minimum: 1 }
-    CommentCreate:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            required: [book_id, content]
-            properties:
-              book_id: { type: integer }
-              content: { type: string }
-
   responses:
     BadRequest:
       description: Bad Request
       content:
         application/json:
           schema:
+            type: object
             properties:
               code: { type: number }
               message: { type: string }
@@ -112,6 +49,7 @@ components:
       content:
         application/json:
           schema:
+            type: object
             properties:
               message: { type: string }
 
@@ -119,12 +57,9 @@ components:
     name:
       type: string
       maxLength: 255
-    list:
-      properties:
-        page_size: { type: integer }
-        last_id: { type: integer }
 
     AccountInfo:
+      type: object
       properties:
         id: { type: integer }
         name: { type: string }
@@ -133,12 +68,14 @@ components:
         is_admin: { type: boolean }
         created_at: { type: string, format: timestamp }
     AccountBrief:
+      type: object
       properties:
         id: { type: integer }
         name: { type: string }
         is_admin: { type: boolean }
         avatar: { type: string, format: uri }
     BookBrief:
+      type: object
       properties:
         id: { type: integer }
         title: { type: string }
@@ -152,16 +89,19 @@ components:
           items: { type: string }
         created_at: { type: string, format: timestamp }
     CategoryBrief:
+      type: object
       properties:
         id: { type: integer }
         name: { type: string }
     CategoryInfo:
+      type: object
       properties:
         id: { type: integer }
         name: { type: string }
         description: { type: string }
         created_at: { type: string, format: timestamp }
     BookmarkInfo:
+      type: object
       properties:
         id: { type: integer }
         book: { $ref: "#/components/schemas/BookBrief" }
@@ -172,6 +112,8 @@ components:
             - read
         created_at: { type: string, format: timestamp }
     FeedbackInfo:
+      type: object
+
       properties:
         id: { type: integer }
         content: { type: string }
@@ -180,13 +122,14 @@ components:
         created_by: { $ref: "#/components/schemas/AccountBrief" }
         created_at: { type: string, format: timestamp }
     RateInfo:
+      type: object
       properties:
         id: { type: integer }
         score: { type: number, maximum: 5, minimum: 1 }
         created_by: { $ref: "#/components/schemas/AccountBrief" }
-
         created_at: { type: string, format: timestamp }
     CommentInfo:
+      type: object
       properties:
         id: { type: integer }
         book_id: { type: integer }
@@ -200,16 +143,27 @@ paths:
       tags: [Auth]
       summary: Login
       security: []
-      requestBody: { $ref: "#/components/requestBodies/Login" }
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
+                type: object
                 properties:
-                  access_token: { type: string, format: JWT }
-                  refresh_token: { type: string, format: JWT }
+                  access_token: { type: string }
+                  refresh_token: { type: string }
                   account: { $ref: "#/components/schemas/AccountInfo" }
         400: { $ref: "#/components/responses/BadRequest" }
         422: { $ref: "#/components/responses/InvalidRequestSchema" }
@@ -223,16 +177,19 @@ paths:
         content:
           application/json:
             schema:
+              type: object
               properties:
-                refresh_token: { type: string, format: JWT }
+                refresh_token: { type: string }
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
+                type: object
                 properties:
-                  access_token: { type: string, format: JWT }
+                  access_token: { type: string }
+                  ttl: {type: string}
         400: { $ref: "#/components/responses/BadRequest" }
         422: { $ref: "#/components/responses/InvalidRequestSchema" }
 
@@ -241,7 +198,17 @@ paths:
       summary: Create account
       tags: [Account]
       security: []
-      requestBody: { $ref: "#/components/requestBodies/AccountCreate" }
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [name, password, email]
+              properties:
+                name: { $ref: "#/components/schemas/name" }
+                password: { type: string, format: password }
+                email: { type: string, format: email }
       responses:
         200:
           description: OK
@@ -271,36 +238,22 @@ paths:
     patch:
       summary: Update account
       tags: [Account]
-      requestBody: { $ref: "#/components/requestBodies/AccountUpdate" }
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { $ref: "#/components/schemas/name" }
+                password: { type: string, pattern: password }
       responses:
         204: { description: OK }
         400: { $ref: "#/components/responses/BadRequest" }
         401: { description: Unauthorize }
         403: { description: Forbidden }
         422: { $ref: "#/components/responses/InvalidRequestSchema" }
-
-  # /accounts/{id}/rates:
-  #   parameters:
-  #     - name: id
-  #       in: path
-  #       schema: { type: integer }
-  #       required: true
-  #   get:
-  #     summary: List personal rates
-  #     tags: [Rate]
-  #     responses:
-  #       200:
-  #         description: Ok
-  #         content:
-  #           application/json:
-  #             schema:
-  #               allOf: [$ref: "#/components/schemas/list"]
-  #               properties:
-  #                 data:
-  #                   type: array
-  #                   items: { $ref: "#/components/schemas/RateInfo" }
-  #       401: { description: Unauthorize }
-  #       403: { description: Forbidden }
 
   /accounts/{id}/bookmarks:
     parameters:
@@ -317,6 +270,7 @@ paths:
           content:
             application/json:
               schema:
+                type: object
                 properties:
                   data:
                     type: array
@@ -344,13 +298,13 @@ paths:
           content:
             application/json:
               schema:
+                type: object
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/BookBrief" }
                   page_size: { type: integer }
                   offset: { type: integer }
-
 
   /books/{id}:
     parameters:
@@ -388,11 +342,13 @@ paths:
           content:
             application/json:
               schema:
-                allOf: [$ref: "#/components/schemas/list"]
+                type: object
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/CommentInfo" }
+                  page_size: { type: integer }
+                  last_id: { type: integer }
         401: { description: Unauthorize }
 
   /books/{id}/rate:
@@ -418,7 +374,16 @@ paths:
     post:
       summary: Bookmark a book
       tags: [Bookmark]
-      requestBody: { $ref: "#/components/requestBodies/BookmarkCreate" }
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [book_id]
+              properties:
+                book_id: { type: integer }
+
       responses:
         204: { description: OK }
         400: { $ref: "#/components/responses/BadRequest" }
@@ -444,7 +409,16 @@ paths:
     post:
       summary: Add rate
       tags: [Rate]
-      requestBody: { $ref: "#/components/requestBodies/RateCreate" }
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [score]
+              properties:
+                score: { type: integer, maximum: 10, minimum: 1 }
+                book_id: { type: integer }
       responses:
         204: { description: OK }
         400: { $ref: "#/components/responses/BadRequest" }
@@ -460,7 +434,15 @@ paths:
     patch:
       summary: Update rate
       tags: [Rate]
-      requestBody: { $ref: "#/components/requestBodies/RateUpdate" }
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [score]
+              properties:
+                score: { type: integer, maximum: 10, minimum: 1 }
       responses:
         204: { description: OK }
         401: { description: Unauthorize }
@@ -480,7 +462,16 @@ paths:
     post:
       summary: Add comment
       tags: [Comment]
-      requestBody: { $ref: "#/components/requestBodies/CommentCreate" }
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [book_id, content]
+              properties:
+                book_id: { type: integer }
+                content: { type: string }
       responses:
         204: { description: OK }
         400: { $ref: "#/components/responses/BadRequest" }

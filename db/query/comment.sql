@@ -9,7 +9,7 @@ INSERT INTO comments (
 
 -- name: GetComment :one
 SELECT *
-FROM comments
+FROM comment_detail
 WHERE id = $1 LIMIT 1;
 
 -- name: UpdateComment :one
@@ -24,7 +24,7 @@ WHERE id = $1;
 
 -- name: ListCommentsByBookId :many
 SELECT *
-FROM comments
+FROM comment_detail
 WHERE book_id = $2 AND NOT id > @last_id
 ORDER BY id DESC
 LIMIT $1;

@@ -49,27 +49,30 @@ func (q *Queries) DeleteComment(ctx context.Context, id int32) error {
 }
 
 const getComment = `-- name: GetComment :one
-SELECT id, content, book_id, created_by, created_at
-FROM comments
+SELECT id, content, book_id, user_id, created_at, username, a_avatar_url, a_is_admin
+FROM comment_detail
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetComment(ctx context.Context, id int32) (Comment, error) {
+func (q *Queries) GetComment(ctx context.Context, id int32) (CommentDetail, error) {
 	row := q.db.QueryRowContext(ctx, getComment, id)
-	var i Comment
+	var i CommentDetail
 	err := row.Scan(
 		&i.ID,
 		&i.Content,
 		&i.BookID,
-		&i.CreatedBy,
+		&i.UserID,
 		&i.CreatedAt,
+		&i.Username,
+		&i.AAvatarUrl,
+		&i.AIsAdmin,
 	)
 	return i, err
 }
 
 const listCommentsByBookId = `-- name: ListCommentsByBookId :many
-SELECT id, content, book_id, created_by, created_at
-FROM comments
+SELECT id, content, book_id, user_id, created_at, username, a_avatar_url, a_is_admin
+FROM comment_detail
 WHERE book_id = $2 AND NOT id > $3
 ORDER BY id DESC
 LIMIT $1
@@ -81,21 +84,24 @@ type ListCommentsByBookIdParams struct {
 	LastID int32 `json:"last_id"`
 }
 
-func (q *Queries) ListCommentsByBookId(ctx context.Context, arg ListCommentsByBookIdParams) ([]Comment, error) {
+func (q *Queries) ListCommentsByBookId(ctx context.Context, arg ListCommentsByBookIdParams) ([]CommentDetail, error) {
 	rows, err := q.db.QueryContext(ctx, listCommentsByBookId, arg.Limit, arg.BookID, arg.LastID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Comment{}
+	items := []CommentDetail{}
 	for rows.Next() {
-		var i Comment
+		var i CommentDetail
 		if err := rows.Scan(
 			&i.ID,
 			&i.Content,
 			&i.BookID,
-			&i.CreatedBy,
+			&i.UserID,
 			&i.CreatedAt,
+			&i.Username,
+			&i.AAvatarUrl,
+			&i.AIsAdmin,
 		); err != nil {
 			return nil, err
 		}

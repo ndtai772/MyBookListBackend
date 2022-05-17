@@ -102,6 +102,17 @@ type CommentCount struct {
 	Count  int64 `json:"count"`
 }
 
+type CommentDetail struct {
+	ID         int32     `json:"id"`
+	Content    string    `json:"content"`
+	BookID     int32     `json:"book_id"`
+	UserID     int32     `json:"user_id"`
+	CreatedAt  time.Time `json:"created_at"`
+	Username   string    `json:"username"`
+	AAvatarUrl string    `json:"a_avatar_url"`
+	AIsAdmin   string    `json:"a_is_admin"`
+}
+
 type Rate struct {
 	ID        int32     `json:"id"`
 	BookID    int32     `json:"book_id"`

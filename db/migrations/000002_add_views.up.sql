@@ -55,3 +55,16 @@ FROM books b
          LEFT OUTER JOIN comment_count c ON b.id = c.book_id
          LEFT OUTER JOIN bookmark_count bm on bm.book_id = b.id
          LEFT OUTER JOIN rate_count r ON r.book_id = b.id;
+
+
+CREATE VIEW comment_detail AS
+SELECT comments.id,
+       comments.content,
+       comments.book_id,
+       comments.created_by as user_id,
+       comments.created_at,
+       a.name::varchar as username,
+       a.avatar_url::varchar,
+       a.is_admin::varchar
+FROM comments
+         LEFT JOIN accounts a on a.id = comments.created_by;
