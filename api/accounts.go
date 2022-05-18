@@ -143,33 +143,46 @@ func (server *Server) listPersonalBookmarks(ctx *gin.Context) {
 // 	})
 // }
 
-// func (server *Server) listPersonalComments(ctx *gin.Context) {
-// 	accountId, err := parseIdUri(ctx)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-// 		return
-// 	}
+func (server *Server) listPersonalComments(ctx *gin.Context) {
+	accountId, err := parseIdUri(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-// 	page_size, last_id, err := parsePaginateQuery(ctx)
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
-// 	if err != nil {
-// 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-// 		return
-// 	}
+	if authPayload.AccountID != accountId {
+		ctx.AbortWithStatus(http.StatusForbidden)
+		return
+	}
 
-// 	comments, err := server.store.ListCommentsByAccoutId(ctx, db.ListCommentsByBookIdParams{
-// 		Limit:     page_size,
-// 		Offset:    offset,
-// 		CreatedBy: accountId,
-// 	})
+	page_size, last_id, err := parsePaginateQuery(ctx)
 
-// 	if err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-// 		return
-// 	}
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"data":       comments,
-// 		"next_index": offset + int32(len(comments)),
-// 	})
-// }
+	comments, err := server.store.ListCommentsByAccountId(ctx, db.ListCommentsByAccountIdParams{
+		UserID:   accountId,
+		PageSize: page_size,
+		LastID:   last_id,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	lastID := -1
+
+	if len(comments) > 0 {
+		lastID = int(comments[len(comments)-1].ID)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"data":    comments,
+		"last_id": lastID,
+	})
+}

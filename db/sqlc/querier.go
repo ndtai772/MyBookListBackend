@@ -16,6 +16,10 @@ type Querier interface {
 	CreateCategory(ctx context.Context, arg CreateCategoryParams) (Category, error)
 	CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error)
 	CreateRate(ctx context.Context, arg CreateRateParams) (Rate, error)
+	// -- name: GetBookmark :one
+	// SELECT *
+	// FROM bookmark_detail
+	// WHERE id = $1 LIMIT 1;
 	DeleteBookmark(ctx context.Context, id int32) error
 	DeleteCategory(ctx context.Context, id int32) error
 	DeleteComment(ctx context.Context, id int32) error
@@ -24,17 +28,20 @@ type Querier interface {
 	GetAccountByEmail(ctx context.Context, email string) (Account, error)
 	GetBook(ctx context.Context, id int32) (BookDetail, error)
 	GetBookBrief(ctx context.Context, id int32) (GetBookBriefRow, error)
-	GetBookmark(ctx context.Context, id int32) (Bookmark, error)
 	GetCategory(ctx context.Context, id int32) (Category, error)
-	GetComment(ctx context.Context, id int32) (CommentDetail, error)
 	GetPersonalRateOfABook(ctx context.Context, arg GetPersonalRateOfABookParams) (Rate, error)
 	GetRate(ctx context.Context, id int32) (Rate, error)
 	ListBookmarkedBooksByAccountId(ctx context.Context, createdBy int32) ([]ListBookmarkedBooksByAccountIdRow, error)
 	ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBooksRow, error)
 	ListBooksByCategoryId(ctx context.Context, arg ListBooksByCategoryIdParams) ([]Book, error)
 	ListCategories(ctx context.Context) ([]Category, error)
-	ListCommentsByBookId(ctx context.Context, arg ListCommentsByBookIdParams) ([]CommentDetail, error)
+	ListCommentsByAccountId(ctx context.Context, arg ListCommentsByAccountIdParams) ([]ListCommentsByAccountIdRow, error)
+	ListCommentsByBookId(ctx context.Context, arg ListCommentsByBookIdParams) ([]ListCommentsByBookIdRow, error)
 	UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error)
+	// -- name: GetComment :one
+	// SELECT *
+	// FROM comment_detail
+	// WHERE id = $1 LIMIT 1;
 	UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error)
 	UpdateRate(ctx context.Context, arg UpdateRateParams) (Rate, error)
 }

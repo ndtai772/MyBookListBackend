@@ -7,10 +7,10 @@ INSERT INTO comments (
     $1, $2, $3
 ) RETURNING *;
 
--- name: GetComment :one
-SELECT *
-FROM comment_detail
-WHERE id = $1 LIMIT 1;
+-- -- name: GetComment :one
+-- SELECT *
+-- FROM comment_detail
+-- WHERE id = $1 LIMIT 1;
 
 -- name: UpdateComment :one
 UPDATE comments
@@ -23,8 +23,23 @@ DELETE FROM comments
 WHERE id = $1;
 
 -- name: ListCommentsByBookId :many
-SELECT *
-FROM comment_detail
-WHERE book_id = $2 AND NOT id > @last_id
-ORDER BY id DESC
-LIMIT $1;
+SELECT comments.*,
+    COALESCE(a.name, '')        as username,
+    COALESCE(a.avatar_url, '')  as avatar_url,
+    COALESCE(a.is_admin, false) as is_admin
+FROM comments
+    LEFT JOIN accounts a
+        ON a.id = comments.created_by
+WHERE book_id = @book_id AND NOT comments.id > @last_id
+ORDER BY comments.id DESC
+LIMIT @page_size;
+
+-- name: ListCommentsByAccountId :many
+SELECT comments.*,
+    b.title,
+    b.cover_url
+FROM comments
+    JOIN books b on b.id = comments.book_id
+WHERE created_by = @user_id AND NOT comments.id > @last_id
+ORDER BY comments.id DESC
+LIMIT @page_size;

@@ -36,29 +36,16 @@ func (q *Queries) CreateBookmark(ctx context.Context, arg CreateBookmarkParams) 
 }
 
 const deleteBookmark = `-- name: DeleteBookmark :exec
+
 DELETE FROM bookmarks
 WHERE id = $1
 `
 
+// -- name: GetBookmark :one
+// SELECT *
+// FROM bookmark_detail
+// WHERE id = $1 LIMIT 1;
 func (q *Queries) DeleteBookmark(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteBookmark, id)
 	return err
-}
-
-const getBookmark = `-- name: GetBookmark :one
-SELECT id, book_id, created_by, created_at
-FROM bookmarks
-WHERE id = $1 LIMIT 1
-`
-
-func (q *Queries) GetBookmark(ctx context.Context, id int32) (Bookmark, error) {
-	row := q.db.QueryRowContext(ctx, getBookmark, id)
-	var i Bookmark
-	err := row.Scan(
-		&i.ID,
-		&i.BookID,
-		&i.CreatedBy,
-		&i.CreatedAt,
-	)
-	return i, err
 }

@@ -18,6 +18,8 @@ func parsePaginateQuery(ctx *gin.Context) (int32, int32, error) {
 		LastID int32 `form:"last_id" binding:"min=0"`
 	}
 
+	paginateQuery.LastID = 1000_0000
+
 	err := ctx.ShouldBindQuery(&paginateQuery)
 
 	return paginateQuery.PageSize, paginateQuery.LastID, err

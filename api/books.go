@@ -215,7 +215,7 @@ func (server *Server) listBookComments(ctx *gin.Context) {
 	}
 
 	comments, err := server.store.ListCommentsByBookId(ctx, db.ListCommentsByBookIdParams{
-		Limit:  page_size,
+		PageSize: page_size,
 		LastID: last_id,
 		BookID: bookId,
 	})

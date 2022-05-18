@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createComment = `-- name: CreateComment :one
@@ -48,60 +49,111 @@ func (q *Queries) DeleteComment(ctx context.Context, id int32) error {
 	return err
 }
 
-const getComment = `-- name: GetComment :one
-SELECT id, content, book_id, user_id, created_at, username, a_avatar_url, a_is_admin
-FROM comment_detail
-WHERE id = $1 LIMIT 1
+const listCommentsByAccountId = `-- name: ListCommentsByAccountId :many
+SELECT comments.id, comments.content, comments.book_id, comments.created_by, comments.created_at,
+    b.title,
+    b.cover_url
+FROM comments
+    JOIN books b on b.id = comments.book_id
+WHERE created_by = $1 AND NOT comments.id > $2
+LIMIT $3
 `
 
-func (q *Queries) GetComment(ctx context.Context, id int32) (CommentDetail, error) {
-	row := q.db.QueryRowContext(ctx, getComment, id)
-	var i CommentDetail
-	err := row.Scan(
-		&i.ID,
-		&i.Content,
-		&i.BookID,
-		&i.UserID,
-		&i.CreatedAt,
-		&i.Username,
-		&i.AAvatarUrl,
-		&i.AIsAdmin,
-	)
-	return i, err
+type ListCommentsByAccountIdParams struct {
+	UserID   int32 `json:"user_id"`
+	LastID   int32 `json:"last_id"`
+	PageSize int32 `json:"page_size"`
 }
 
-const listCommentsByBookId = `-- name: ListCommentsByBookId :many
-SELECT id, content, book_id, user_id, created_at, username, a_avatar_url, a_is_admin
-FROM comment_detail
-WHERE book_id = $2 AND NOT id > $3
-ORDER BY id DESC
-LIMIT $1
-`
-
-type ListCommentsByBookIdParams struct {
-	Limit  int32 `json:"limit"`
-	BookID int32 `json:"book_id"`
-	LastID int32 `json:"last_id"`
+type ListCommentsByAccountIdRow struct {
+	ID        int32     `json:"id"`
+	Content   string    `json:"content"`
+	BookID    int32     `json:"book_id"`
+	CreatedBy int32     `json:"created_by"`
+	CreatedAt time.Time `json:"created_at"`
+	Title     string    `json:"title"`
+	CoverUrl  string    `json:"cover_url"`
 }
 
-func (q *Queries) ListCommentsByBookId(ctx context.Context, arg ListCommentsByBookIdParams) ([]CommentDetail, error) {
-	rows, err := q.db.QueryContext(ctx, listCommentsByBookId, arg.Limit, arg.BookID, arg.LastID)
+func (q *Queries) ListCommentsByAccountId(ctx context.Context, arg ListCommentsByAccountIdParams) ([]ListCommentsByAccountIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCommentsByAccountId, arg.UserID, arg.LastID, arg.PageSize)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []CommentDetail{}
+	items := []ListCommentsByAccountIdRow{}
 	for rows.Next() {
-		var i CommentDetail
+		var i ListCommentsByAccountIdRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Content,
 			&i.BookID,
-			&i.UserID,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.Title,
+			&i.CoverUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCommentsByBookId = `-- name: ListCommentsByBookId :many
+SELECT comments.id, comments.content, comments.book_id, comments.created_by, comments.created_at,
+    COALESCE(a.name, '')        as username,
+    COALESCE(a.avatar_url, '')  as avatar_url,
+    COALESCE(a.is_admin, false) as is_admin
+FROM comments
+    LEFT JOIN accounts a
+        ON a.id = comments.created_by
+WHERE book_id = $1
+  AND NOT comments.id > $2
+LIMIT $3
+`
+
+type ListCommentsByBookIdParams struct {
+	BookID   int32 `json:"book_id"`
+	LastID   int32 `json:"last_id"`
+	PageSize int32 `json:"page_size"`
+}
+
+type ListCommentsByBookIdRow struct {
+	ID        int32     `json:"id"`
+	Content   string    `json:"content"`
+	BookID    int32     `json:"book_id"`
+	CreatedBy int32     `json:"created_by"`
+	CreatedAt time.Time `json:"created_at"`
+	Username  string    `json:"username"`
+	AvatarUrl string    `json:"avatar_url"`
+	IsAdmin   bool      `json:"is_admin"`
+}
+
+func (q *Queries) ListCommentsByBookId(ctx context.Context, arg ListCommentsByBookIdParams) ([]ListCommentsByBookIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCommentsByBookId, arg.BookID, arg.LastID, arg.PageSize)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListCommentsByBookIdRow{}
+	for rows.Next() {
+		var i ListCommentsByBookIdRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Content,
+			&i.BookID,
+			&i.CreatedBy,
 			&i.CreatedAt,
 			&i.Username,
-			&i.AAvatarUrl,
-			&i.AIsAdmin,
+			&i.AvatarUrl,
+			&i.IsAdmin,
 		); err != nil {
 			return nil, err
 		}
@@ -117,6 +169,7 @@ func (q *Queries) ListCommentsByBookId(ctx context.Context, arg ListCommentsByBo
 }
 
 const updateComment = `-- name: UpdateComment :one
+
 UPDATE comments
 SET content = $2
 WHERE id = $1
@@ -128,6 +181,10 @@ type UpdateCommentParams struct {
 	Content string `json:"content"`
 }
 
+// -- name: GetComment :one
+// SELECT *
+// FROM comment_detail
+// WHERE id = $1 LIMIT 1;
 func (q *Queries) UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error) {
 	row := q.db.QueryRowContext(ctx, updateComment, arg.ID, arg.Content)
 	var i Comment

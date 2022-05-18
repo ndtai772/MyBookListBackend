@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/ndtai772/MyBookListBackend/api"
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
+	// sampledata "github.com/ndtai772/MyBookListBackend/sample_data"
 )
 
 const (
@@ -22,6 +23,8 @@ func main() {
 	}
 
 	store := db.NewStore(conn)
+
+	// sampledata.Gen(store)
 
 	server := api.NewServer(store)
 

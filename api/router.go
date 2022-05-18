@@ -28,7 +28,7 @@ func (server *Server) setupRouter() {
 	authRoutes.PATCH("/accounts/:id", unimplemented("update account"))
 	authRoutes.GET("/accounts/:id/bookmarks", server.listPersonalBookmarks)
 	authRoutes.GET("/accounts/:id/rates", unimplemented("list personal rates"))
-	authRoutes.GET("/accounts/:id/comments", unimplemented("list personal comments"))
+	authRoutes.GET("/accounts/:id/comments", server.listPersonalComments)
 
 	// Books
 	publicRoutes.GET("/books", server.listBooks)
