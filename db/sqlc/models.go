@@ -68,6 +68,7 @@ type BookDetail struct {
 type Bookmark struct {
 	ID        int32     `json:"id"`
 	BookID    int32     `json:"book_id"`
+	Type      int32     `json:"type"`
 	CreatedBy int32     `json:"created_by"`
 	CreatedAt time.Time `json:"created_at"`
 }

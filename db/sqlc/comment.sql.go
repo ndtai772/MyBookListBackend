@@ -49,6 +49,25 @@ func (q *Queries) DeleteComment(ctx context.Context, id int32) error {
 	return err
 }
 
+const getComment = `-- name: GetComment :one
+SELECT id, content, book_id, created_by, created_at
+FROM comments
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetComment(ctx context.Context, id int32) (Comment, error) {
+	row := q.db.QueryRowContext(ctx, getComment, id)
+	var i Comment
+	err := row.Scan(
+		&i.ID,
+		&i.Content,
+		&i.BookID,
+		&i.CreatedBy,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const listCommentsByAccountId = `-- name: ListCommentsByAccountId :many
 SELECT comments.id, comments.content, comments.book_id, comments.created_by, comments.created_at,
     b.title,
@@ -56,6 +75,7 @@ SELECT comments.id, comments.content, comments.book_id, comments.created_by, com
 FROM comments
     JOIN books b on b.id = comments.book_id
 WHERE created_by = $1 AND NOT comments.id > $2
+ORDER BY comments.id DESC
 LIMIT $3
 `
 
@@ -114,8 +134,8 @@ SELECT comments.id, comments.content, comments.book_id, comments.created_by, com
 FROM comments
     LEFT JOIN accounts a
         ON a.id = comments.created_by
-WHERE book_id = $1
-  AND NOT comments.id > $2
+WHERE book_id = $1 AND NOT comments.id > $2
+ORDER BY comments.id DESC
 LIMIT $3
 `
 
@@ -169,7 +189,6 @@ func (q *Queries) ListCommentsByBookId(ctx context.Context, arg ListCommentsByBo
 }
 
 const updateComment = `-- name: UpdateComment :one
-
 UPDATE comments
 SET content = $2
 WHERE id = $1
@@ -181,10 +200,6 @@ type UpdateCommentParams struct {
 	Content string `json:"content"`
 }
 
-// -- name: GetComment :one
-// SELECT *
-// FROM comment_detail
-// WHERE id = $1 LIMIT 1;
 func (q *Queries) UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error) {
 	row := q.db.QueryRowContext(ctx, updateComment, arg.ID, arg.Content)
 	var i Comment

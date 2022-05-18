@@ -198,3 +198,66 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBoo
 	}
 	return items, nil
 }
+
+const listBooksByCategoryId = `-- name: ListBooksByCategoryId :many
+
+
+SELECT books.id, books.title, books.author, books.description, books.year, books.language, books.publisher, books.pages, books.cover_url, books.created_at
+FROM books
+LEFT JOIN book_category
+ON  book_category.category_id = $2
+    AND book_category.book_id = books.id
+WHERE NOT id > $3
+ORDER BY books.id DESC
+LIMIT $1
+`
+
+type ListBooksByCategoryIdParams struct {
+	Limit      int32 `json:"limit"`
+	CategoryID int32 `json:"category_id"`
+	LastID     int32 `json:"last_id"`
+}
+
+// -- name: UpdateBook :one
+// UPDATE books
+// SET title = $2,
+//     author = $3,
+//     description = $4
+// WHERE id = $1
+// RETURNING *;
+// -- name: DeleteBook :exec
+// DELETE FROM books
+// WHERE id = $1;
+func (q *Queries) ListBooksByCategoryId(ctx context.Context, arg ListBooksByCategoryIdParams) ([]Book, error) {
+	rows, err := q.db.QueryContext(ctx, listBooksByCategoryId, arg.Limit, arg.CategoryID, arg.LastID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Book{}
+	for rows.Next() {
+		var i Book
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Author,
+			&i.Description,
+			&i.Year,
+			&i.Language,
+			&i.Publisher,
+			&i.Pages,
+			&i.CoverUrl,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

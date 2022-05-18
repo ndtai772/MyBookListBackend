@@ -7,10 +7,10 @@ INSERT INTO comments (
     $1, $2, $3
 ) RETURNING *;
 
--- -- name: GetComment :one
--- SELECT *
--- FROM comment_detail
--- WHERE id = $1 LIMIT 1;
+-- name: GetComment :one
+SELECT *
+FROM comments
+WHERE id = $1 LIMIT 1;
 
 -- name: UpdateComment :one
 UPDATE comments

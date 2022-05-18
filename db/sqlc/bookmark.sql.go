@@ -9,13 +9,37 @@ import (
 	"context"
 )
 
+const checkBookmark = `-- name: CheckBookmark :one
+SELECT id, book_id, type, created_by, created_at
+FROM bookmarks
+WHERE book_id = $1 AND created_by = $2
+`
+
+type CheckBookmarkParams struct {
+	BookID    int32 `json:"book_id"`
+	CreatedBy int32 `json:"created_by"`
+}
+
+func (q *Queries) CheckBookmark(ctx context.Context, arg CheckBookmarkParams) (Bookmark, error) {
+	row := q.db.QueryRowContext(ctx, checkBookmark, arg.BookID, arg.CreatedBy)
+	var i Bookmark
+	err := row.Scan(
+		&i.ID,
+		&i.BookID,
+		&i.Type,
+		&i.CreatedBy,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const createBookmark = `-- name: CreateBookmark :one
 INSERT INTO bookmarks (
     book_id,
     created_by
 ) VALUES (
     $1, $2
-) RETURNING id, book_id, created_by, created_at
+) RETURNING id, book_id, type, created_by, created_at
 `
 
 type CreateBookmarkParams struct {
@@ -29,6 +53,7 @@ func (q *Queries) CreateBookmark(ctx context.Context, arg CreateBookmarkParams) 
 	err := row.Scan(
 		&i.ID,
 		&i.BookID,
+		&i.Type,
 		&i.CreatedBy,
 		&i.CreatedAt,
 	)
@@ -36,16 +61,92 @@ func (q *Queries) CreateBookmark(ctx context.Context, arg CreateBookmarkParams) 
 }
 
 const deleteBookmark = `-- name: DeleteBookmark :exec
-
 DELETE FROM bookmarks
 WHERE id = $1
 `
 
-// -- name: GetBookmark :one
-// SELECT *
-// FROM bookmark_detail
-// WHERE id = $1 LIMIT 1;
 func (q *Queries) DeleteBookmark(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteBookmark, id)
 	return err
+}
+
+const getBookmark = `-- name: GetBookmark :one
+SELECT id, book_id, type, created_by, created_at
+FROM bookmarks
+WHERE id = $1
+`
+
+func (q *Queries) GetBookmark(ctx context.Context, id int32) (Bookmark, error) {
+	row := q.db.QueryRowContext(ctx, getBookmark, id)
+	var i Bookmark
+	err := row.Scan(
+		&i.ID,
+		&i.BookID,
+		&i.Type,
+		&i.CreatedBy,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const listBookmarkedBooksByAccountId = `-- name: ListBookmarkedBooksByAccountId :many
+SELECT 
+    books.id as book_id,
+    books.title,
+    books.author,
+    books.language,
+    books.publisher,
+    books.pages,
+    books.cover_url,
+    bookmarks.id as bookmark_id,
+    bookmarks.type as bookmark_type
+FROM bookmarks
+    JOIN books on books.id = bookmarks.book_id
+WHERE bookmarks.created_by = $1
+ORDER BY bookmarks.id DESC
+`
+
+type ListBookmarkedBooksByAccountIdRow struct {
+	BookID       int32  `json:"book_id"`
+	Title        string `json:"title"`
+	Author       string `json:"author"`
+	Language     string `json:"language"`
+	Publisher    string `json:"publisher"`
+	Pages        int16  `json:"pages"`
+	CoverUrl     string `json:"cover_url"`
+	BookmarkID   int32  `json:"bookmark_id"`
+	BookmarkType int32  `json:"bookmark_type"`
+}
+
+func (q *Queries) ListBookmarkedBooksByAccountId(ctx context.Context, createdBy int32) ([]ListBookmarkedBooksByAccountIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, listBookmarkedBooksByAccountId, createdBy)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListBookmarkedBooksByAccountIdRow{}
+	for rows.Next() {
+		var i ListBookmarkedBooksByAccountIdRow
+		if err := rows.Scan(
+			&i.BookID,
+			&i.Title,
+			&i.Author,
+			&i.Language,
+			&i.Publisher,
+			&i.Pages,
+			&i.CoverUrl,
+			&i.BookmarkID,
+			&i.BookmarkType,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

@@ -27,7 +27,7 @@ func toAccountRes(account db.Account) AccountRes {
 		ID:        account.ID,
 		Name:      account.Name,
 		Email:     account.Email,
-		AvatarUrl: fmt.Sprintf("https://ui-avatars.com/api/?name=%s", url.QueryEscape(account.Name)),
+		AvatarUrl: account.AvatarUrl,
 		IsAdmin:   account.IsAdmin,
 		CreatedAt: account.CreatedAt,
 	}
@@ -57,6 +57,7 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		Email:          reqForm.Email,
 		HashedPassword: hashedPw,
 		IsAdmin:        false,
+		AvatarUrl:      fmt.Sprintf("https://ui-avatars.com/api/?name=%s", url.QueryEscape(reqForm.Name)),
 	}
 
 	account, err := server.store.CreateAccount(ctx, arg)

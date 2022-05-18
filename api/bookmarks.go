@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -39,10 +40,23 @@ func (server *Server) createBookmark(ctx *gin.Context) {
 }
 
 func (server *Server) deleteBookmark(ctx *gin.Context) {
-	// TODO: verify ownership of the bookmark
 	id, err := parseIdUri(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	bookmarks, err := server.store.GetBookmark(ctx, id)
+
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	if bookmarks.CreatedBy != authPayload.AccountID {
+		ctx.JSON(http.StatusForbidden, errorResponse(errors.New("you don't own this bookmark")))
 		return
 	}
 

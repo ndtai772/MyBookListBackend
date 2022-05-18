@@ -39,3 +39,13 @@ LIMIT $1;
 -- -- name: DeleteBook :exec
 -- DELETE FROM books
 -- WHERE id = $1;
+
+-- name: ListBooksByCategoryId :many
+SELECT books.*
+FROM books
+LEFT JOIN book_category
+ON  book_category.category_id = $2
+    AND book_category.book_id = books.id
+WHERE NOT id > @last_id
+ORDER BY books.id DESC
+LIMIT $1;

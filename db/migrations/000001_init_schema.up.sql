@@ -37,6 +37,7 @@ CREATE TABLE "book_category" (
 CREATE TABLE "bookmarks" (
   "id" SERIAL PRIMARY KEY,
   "book_id" INT NOT NULL,
+  "type" INT NOT NULL,
   "created_by" INT NOT NULL,
   "created_at" TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -40,10 +41,23 @@ func (server *Server) createComment(ctx *gin.Context) {
 }
 
 func (server *Server) deleteComment(ctx *gin.Context) {
-	// TODO: verify ownership of the comment
 	commentId, err := parseIdUri(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	comment, err := server.store.GetBookmark(ctx, commentId)
+
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	if comment.CreatedBy != authPayload.AccountID {
+		ctx.JSON(http.StatusForbidden, errorResponse(errors.New("you don't own this comment")))
 		return
 	}
 

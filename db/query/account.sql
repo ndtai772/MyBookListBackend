@@ -3,9 +3,10 @@ INSERT INTO accounts (
     name,
     email,
     hashed_password,
+    avatar_url,
     is_admin
 ) VALUES (
-    $1, $2, $3, $4
+    $1, $2, $3, $4, $5
 ) RETURNING *;
 
 -- name: GetAccount :one

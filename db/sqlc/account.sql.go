@@ -14,9 +14,10 @@ INSERT INTO accounts (
     name,
     email,
     hashed_password,
+    avatar_url,
     is_admin
 ) VALUES (
-    $1, $2, $3, $4
+    $1, $2, $3, $4, $5
 ) RETURNING id, name, email, hashed_password, avatar_url, is_admin, created_at
 `
 
@@ -24,6 +25,7 @@ type CreateAccountParams struct {
 	Name           string `json:"name"`
 	Email          string `json:"email"`
 	HashedPassword string `json:"hashed_password"`
+	AvatarUrl      string `json:"avatar_url"`
 	IsAdmin        bool   `json:"is_admin"`
 }
 
@@ -32,6 +34,7 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (A
 		arg.Name,
 		arg.Email,
 		arg.HashedPassword,
+		arg.AvatarUrl,
 		arg.IsAdmin,
 	)
 	var i Account

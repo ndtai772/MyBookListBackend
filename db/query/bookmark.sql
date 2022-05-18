@@ -6,12 +6,32 @@ INSERT INTO bookmarks (
     $1, $2
 ) RETURNING *;
 
--- -- name: GetBookmark :one
--- SELECT *
--- FROM bookmark_detail
--- WHERE id = $1 LIMIT 1;
+-- name: GetBookmark :one
+SELECT *
+FROM bookmarks
+WHERE id = $1;
+
+-- name: CheckBookmark :one
+SELECT *
+FROM bookmarks
+WHERE book_id = $1 AND created_by = $2;
 
 -- name: DeleteBookmark :exec
 DELETE FROM bookmarks
 WHERE id = $1;
 
+-- name: ListBookmarkedBooksByAccountId :many
+SELECT 
+    books.id as book_id,
+    books.title,
+    books.author,
+    books.language,
+    books.publisher,
+    books.pages,
+    books.cover_url,
+    bookmarks.id as bookmark_id,
+    bookmarks.type as bookmark_type
+FROM bookmarks
+    JOIN books on books.id = bookmarks.book_id
+WHERE bookmarks.created_by = $1
+ORDER BY bookmarks.id DESC;
