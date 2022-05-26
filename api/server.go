@@ -19,12 +19,13 @@ type Server struct {
 }
 
 const (
-	DOMAIN_NAME = "api.mybooklist.ndtai.me"
+	DOMAIN_NAME      = "api.mybooklist.ndtai.me"
 	MEILISEARCH_HOST = "http://127.0.0.1:7700"
+	TOKEN_SECRET     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXcVCJ9"
 )
 
 func NewServer(store *db.Store) *Server {
-	tokenMaker, err := token.NewJWTMaker("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXcVCJ9")
+	tokenMaker, err := token.NewJWTMaker(TOKEN_SECRET)
 	if err != nil {
 		panic(fmt.Errorf("cannot create JWT maker %w", err))
 	}
@@ -57,7 +58,6 @@ func NewServer(store *db.Store) *Server {
 	server.indexBooks()
 	return server
 }
-
 
 func (server *Server) Start(address string) error {
 	return server.router.Run(address)

@@ -46,6 +46,7 @@ type Querier interface {
 	ListCategories(ctx context.Context) ([]Category, error)
 	ListCommentsByAccountId(ctx context.Context, arg ListCommentsByAccountIdParams) ([]ListCommentsByAccountIdRow, error)
 	ListCommentsByBookId(ctx context.Context, arg ListCommentsByBookIdParams) ([]ListCommentsByBookIdRow, error)
+	UpdateBookmarkType(ctx context.Context, arg UpdateBookmarkTypeParams) (Bookmark, error)
 	UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error)
 	UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error)
 	UpdateRate(ctx context.Context, arg UpdateRateParams) (Rate, error)

@@ -36,19 +36,21 @@ func (q *Queries) CheckBookmark(ctx context.Context, arg CheckBookmarkParams) (B
 const createBookmark = `-- name: CreateBookmark :one
 INSERT INTO bookmarks (
     book_id,
+    type,
     created_by
 ) VALUES (
-    $1, $2
+    $1, $2, $3
 ) RETURNING id, book_id, type, created_by, created_at
 `
 
 type CreateBookmarkParams struct {
 	BookID    int32 `json:"book_id"`
+	Type      int32 `json:"type"`
 	CreatedBy int32 `json:"created_by"`
 }
 
 func (q *Queries) CreateBookmark(ctx context.Context, arg CreateBookmarkParams) (Bookmark, error) {
-	row := q.db.QueryRowContext(ctx, createBookmark, arg.BookID, arg.CreatedBy)
+	row := q.db.QueryRowContext(ctx, createBookmark, arg.BookID, arg.Type, arg.CreatedBy)
 	var i Bookmark
 	err := row.Scan(
 		&i.ID,
@@ -149,4 +151,29 @@ func (q *Queries) ListBookmarkedBooksByAccountId(ctx context.Context, createdBy 
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateBookmarkType = `-- name: UpdateBookmarkType :one
+UPDATE bookmarks
+SET type = $1
+WHERE id = $2
+RETURNING id, book_id, type, created_by, created_at
+`
+
+type UpdateBookmarkTypeParams struct {
+	NewBookmarkType int32 `json:"new_bookmark_type"`
+	ID              int32 `json:"id"`
+}
+
+func (q *Queries) UpdateBookmarkType(ctx context.Context, arg UpdateBookmarkTypeParams) (Bookmark, error) {
+	row := q.db.QueryRowContext(ctx, updateBookmarkType, arg.NewBookmarkType, arg.ID)
+	var i Bookmark
+	err := row.Scan(
+		&i.ID,
+		&i.BookID,
+		&i.Type,
+		&i.CreatedBy,
+		&i.CreatedAt,
+	)
+	return i, err
 }

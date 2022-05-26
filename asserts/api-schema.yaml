@@ -189,7 +189,7 @@ paths:
                 type: object
                 properties:
                   access_token: { type: string }
-                  ttl: {type: string}
+                  ttl: { type: string }
         400: { $ref: "#/components/responses/BadRequest" }
         422: { $ref: "#/components/responses/InvalidRequestSchema" }
 
@@ -383,6 +383,7 @@ paths:
               required: [book_id]
               properties:
                 book_id: { type: integer }
+                bookmark_type: { type: integer }
 
       responses:
         204: { description: OK }
@@ -401,6 +402,28 @@ paths:
       tags: [Bookmark]
       responses:
         204: { description: OK }
+        401: { description: Unauthorize }
+        403: { description: Forbidden }
+        404: { description: NotFound }
+    patch:
+      summary: Update bookmark type
+      tags: [Bookmark]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [bookmark_type]
+              properties:
+                bookmark_type: { type: string }
+
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BookmarkInfo" }
         401: { description: Unauthorize }
         403: { description: Forbidden }
         404: { description: NotFound }
@@ -492,3 +515,54 @@ paths:
         401: { description: Unauthorize }
         403: { description: Forbidden }
         404: { description: NotFound }
+  /categories:
+    get:
+      summary: List categories
+      tags: [Category]
+      security: []
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/CategoryInfo" }
+
+  /categories/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema: { type: integer, format: snowflakeId }
+        required: true
+    put:
+      summary: Edit category
+      tags: [Category]
+      security: [Role: [admin]]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              minProperties: 1
+              properties:
+                name: { type: string }
+                description: { type: string }
+      responses:
+        204: { description: Ok }
+        400: { $ref: "#/components/responses/BadRequest" }
+        401: { description: Unauthorize }
+        404: { description: NotFound }
+        403: { description: Forbidden }
+        422: { $ref: "#/components/responses/InvalidRequestSchema" }
+    delete:
+      summary: Remove category
+      tags: [Category]
+      security: [Role: [admin]]
+      responses:
+        204: { description: OK }
+        401: { description: Unauthorize }
+        404: { description: NotFound }
+        403: { description: Forbidden }

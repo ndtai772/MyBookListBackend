@@ -3,9 +3,7 @@ package sampledata
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"strings"
 	"sync"
 
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
@@ -15,16 +13,16 @@ import (
 var gContext context.Context = context.Background()
 
 const (
-	NUM_OF_USERS           = 100
+	NUM_OF_USERS           = 20
 	NUM_OF_CATEGORIES      = 25
 	NUM_OF_BOOKS           = 1000
 	MAX_RATE_PER_USER      = NUM_OF_BOOKS / 4
 	MAX_BOOKMARKS_PER_USER = NUM_OF_BOOKS / 4
-	MAX_COMMENTS_PER_BOOK  = 20
+	MAX_COMMENTS_PER_BOOK  = 10
 )
 
 func Gen(store *db.Store) {
-	addCategory(store)
+	// addCategory(store)
 
 	randomUsers(store)
 
@@ -64,7 +62,7 @@ func randomUsers(store *db.Store) {
 
 func randomBookCategories(store *db.Store) {
 	for bookId := 1; bookId <= NUM_OF_BOOKS; bookId++ {
-		numberOfCategories := util.RandomInt(5, 10)
+		numberOfCategories := util.RandomInt(3, 5)
 		categories := map[int64]bool{}
 
 		for {
@@ -161,28 +159,28 @@ func randomComments(store *db.Store) {
 	}
 }
 
-func addCategory(store *db.Store) {
-	buff, err := ioutil.ReadFile("sample_data/categories.txt")
-	if err != nil {
-		panic("couldn't read data from file")
-	}
-	data := string(buff)
-	lines := strings.Split(data, "\n")
+// func addCategory(store *db.Store) {
+// 	buff, err := ioutil.ReadFile("sample_data/categories.txt")
+// 	if err != nil {
+// 		panic("couldn't read data from file")
+// 	}
+// 	data := string(buff)
+// 	lines := strings.Split(data, "\n")
 
-	createCategoryParams := []db.CreateCategoryParams{}
+// 	createCategoryParams := []db.CreateCategoryParams{}
 
-	for i := 0; i + 1 < len(lines); i += 2 {
-		name := strings.TrimSpace(lines[i])
-		description := strings.TrimSpace(lines[i + 1])
+// 	for i := 0; i + 1 < len(lines); i += 2 {
+// 		name := strings.TrimSpace(lines[i])
+// 		description := strings.TrimSpace(lines[i + 1])
 		
-		createCategoryParams = append(createCategoryParams, db.CreateCategoryParams{
-			Name: name,
-			Description: description,
-		})
-	}
-	for i := 0; i < len(createCategoryParams); i++ {
-		store.CreateCategory(gContext, createCategoryParams[i])
-		log.Println("created a new category")
-	}
+// 		createCategoryParams = append(createCategoryParams, db.CreateCategoryParams{
+// 			Name: name,
+// 			Description: description,
+// 		})
+// 	}
+// 	for i := 0; i < len(createCategoryParams); i++ {
+// 		store.CreateCategory(gContext, createCategoryParams[i])
+// 		log.Println("created a new category")
+// 	}
 
-}
+// }

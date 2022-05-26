@@ -1,9 +1,10 @@
 -- name: CreateBookmark :one
 INSERT INTO bookmarks (
     book_id,
+    type,
     created_by
 ) VALUES (
-    $1, $2
+    $1, $2, $3
 ) RETURNING *;
 
 -- name: GetBookmark :one
@@ -15,6 +16,12 @@ WHERE id = $1;
 SELECT *
 FROM bookmarks
 WHERE book_id = $1 AND created_by = $2;
+
+-- name: UpdateBookmarkType :one
+UPDATE bookmarks
+SET type = @new_bookmark_type
+WHERE id = @id
+RETURNING *;
 
 -- name: DeleteBookmark :exec
 DELETE FROM bookmarks

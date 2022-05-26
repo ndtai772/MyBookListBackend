@@ -51,6 +51,7 @@ func (server *Server) setupRouter() {
 	// Bookmarks
 	authRoutes.POST("/bookmarks", server.createBookmark)
 	authRoutes.DELETE("/bookmarks/:id", server.deleteBookmark)
+	authRoutes.PATCH("/bookmarks/:id", server.updateBookmarkType)
 
 	// Rates
 	authRoutes.POST("/rates", server.createRate)
