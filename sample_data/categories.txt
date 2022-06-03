@@ -4,25 +4,13 @@ Adventure
  	Books whose characters undergo some kind of quest or task to accomplish a goal, often a journey, and usually dangerous.
 Alternate History 	
  	Discussion of what might have been, given different decisions and actions at key points in history -- if Hitler had won WWII, or if Hitler hadn't ever come to power, for example.
-Androids, Cyborgs & Robots 	
- 	Stories in which the main story, a major sub-theme, or one (or more) of the central characters, involves cybernetic limb replacement, anthropomorphic (i.e., human-like) androids, or autonomous robots.
-Angels & Demons 	
- 	Stories that involve immortal spirits interacting with mortals, and possibly even assuming physical form. Usually, but not always, involves a religious theme, or morality play. Also included here are lesser spirits given mortally created form, such as enchanted constructs (golems), incubated homunculi, and other types of magical mortal familiars inhabited by immortal spirits.
 Animal 	
  	Books which have animals as the main characters, or whose plots revolve around animals. For example, the Redwall series by Brian Jacques.
-Arthurian Legends 	
- 	Stories relating in some way to the mythology surrounding King Arthur and his Knights of the Round Table. May be historical, may be fantasy (or neither), but has Arthur as a central theme.
 Artificial Intelligence 	
  	Stories in which the main story, a major sub-theme, or one (or more) of the central characters, involves or explores the role and/or nature of computer intelligence. Examples: 2001 (HAL), Number of the Beast (Gay Deceiver), etc.
-Autobiography/ Memoirs 	
- 	Non-Fiction books about the lives of the author that wrote them.
-Avante Garde & Surreal 	
- 	Books having a deliberately non-traditional experimental story structure, and/or highly unusual or surreal writing style.
 Biographical 	
  	Nonfiction books about the lives of real people.
-Business 	
- 	
-Childrens 	
+Children	
  	Books intended either to be read to children, or to be read by children who are still learning to read well, up to perhaps age 8 or so.
 Christmas 	
  	Works about the traditional Christian holy day.
@@ -34,116 +22,58 @@ Computers
  	Books about computer software packages, computer hardware, computer languages and operating systems, various computer applications, the internet, and stories about same.
 Contemporary 	
  	The setting is in the modern world, filled with the hustle and bustle of our everyday lives.
-Crime & Prison 	
- 	Books in which the primary focus involves crime, criminals, gangs, the mafia, etc.
-Criticism & Commentary 	
- 	A book whose main purpose is to interpret, analyze, or otherwise opine about the work of another author, real life events (past, present or projected), a body of thought, a belief system, etc
-Death, Dying and Grieving 	
- 	Literature which explores the process of death, dying, and grieving from the perspective of the person experiencing it and/or the perspective of those close to him/her.
 Decision Tree 	
  	Includes those "Choose Your Own Adventure" books you may remember. The reader chooses which parts of the book to read to form a story based on the decisions they make for the characters.
-Economics 	
- 	
-Educational, Instructional, Reference 	
- 	Books that focus on educating/instructing the reader on a particular subject (i.e., how-to books), or which are intended to serve as an information reference (i.e., encyclopedias, dictionaries, charts & tables, etc).
 Epic Saga 	
  	A book, or often series of books, with far-reaching storylines that involve an entire region or world (or more). Usually, characters in such sagas have great effect on their surroundings. The books or series themselves tend to be long, and often dense reading.
 Erotic 	
  	Stories in which sex and/or sensuality play a major role. Not necessarily romance, as love is not always included. Often for mature audiences only.
-Espionage 	
- 	Books in which the primary focus involves spying and spycraft, of any flavor (military, corporate, international, etc.)
-Ethics and Morality 	
- 	Books that deal with Ethics (the discipline dealing with what is good and bad) or Morality (referring to a code of conduct put forward by a society or, some other group, such as a religion, or accepted by an individual for their own behaviour or given specified conditions, would be put forward by all rational persons. ) or have those as major themes.
-Ethnic: Native American 	
- 	Works which come from the history and legends of Native Americans, and works that explain and expound upon the same, as well as work written by Native Americans.
 Fairy Tales 	
  	Books which deal heavily with well-known children's wonder tales such as Cinderella, Snow White, etc. Also includes stories which feature fairies, faeries, and fae as primary characters or plot devices.
 Family Life 	
  	Best described by Plato in 'The Republic" --- We have been long expecting that you would tell us something about the family life of your citizens--how they will bring children into the world, and rear them when they have arrived, and, in general, what is the nature of this community of women and children-for we are of opinion that the right or wrong management of such matters will have a great and paramount influence on the State for good or for evil.
 Fantasy 	
  	Speculative fiction that relies on magic and/or mythology for its differences from "reality."
-Feminism 	
- 	Books discussing themes to do with the self-liberation of women from gender based limitations, feminism or femininity in general, or books (fictional or biographical) focusing exclusively on strong female main character(s) and/or matriachal societies.
-Fiction (General) 	
- 	Fictional stories can be based on actual people or events or be based entirely on the author's imagination, but all fictional stories contain elements that are made-up or created by the author.
-Film & Television 	
+Film 	
  	Books pertaining to the Film and Television entertainment industry. Works may include history of the medium, commentary, textbooks, episode guides, collectibles, trivia, movie storybooks and related published film tie-ins. Not to be confused with the "Novelizations" genre, which involves adaptations of stories from these media into novel form, rather than the reverse.
 Fine Arts 	
  	Books in which the primary focus involves one (or more) branches of the visual or performing arts: Drawing & Painting, Photography, Sculpture, Fashion, Opera, Concert Pianist, Violinist etc.
-Folklore & Mythology 	
- 	Books that are primarily a re-telling, collection, or analysis of the beliefs of previous or current cultures. These beliefs may be termed religion by their believers, but are often interpreted by others as allegories and wonder tales.
-Food & Wine 	
+Food 	
  	Books in which the primary focus involves food and/or beverages. Includes (variously) cookbooks, tell alls & (auto)biographies by people in the industry, restaurant reviews & guides, ingredient and technique guides, books on making & appreciating various beverages (alcoholic or otherwise), etc.
-Freemasonry 	
- 	Literature by, and about, the ancient fraternal order of Free and Accepted Masons.
-Games & Entertainment 	
+Games 	
  	Books intended to provide or enhance rules for game-playing, often role-playing games such as Dungeons & Dragons.
 Genealogy 	
  	Books whose primary subject matter involves the exploration/documentation of family trees and family history.
-GENRE NEEDED 	
- 	We can use this to flag books that are awaiting the addition of a new genre.
 Ghosts 	
  	Stories that involve the restless non-corporeal spirits of former mortals. Usually, but not always, a sub-genre under horror.
 Graphic Novel 	
  	A novel whose narrative is related through a combination of text and art, often in western style comic-strip form. Includes many superhero works, such as Superman and X-men.
-Health, Fitness, Medical & Nutrition 	
- 	Books about healthy living, fitness and exercise, nutrition, consumer advice regarding medical conditions, etc.
 Hi-Tech 	
  	Tales in which technology is a major focus -- whether as a goal, a tool, a weapon, or something else. Often, but not always, science fiction.
 Historical 	
  	Stories that take place in the past. Usually the plots are things that could actually have happened and are sometimes based on true events.
 Horror 	
  	Stories which intend to frighten the reader, whether with monsters (Frankenstein, Stephen King's It), psychological terrors (much of V.C. Andrews' work) or other methods.
-Humour & Satire 	
- 	Tales with the intent to make you laugh, or at least smile. May be sardonic observations of reality or stories of amusing fictional characters or events, among other types.
-Inspirational, Therapeutic & Self Help 	
- 	Books that teach us ways to improve ourselves. From learning how to cope with chronic illness to showing how others have overcome the same obstacles we face, these books provide us with the know-how to live healthier and less stressful lives.
 Juvenile 	
  	Books intended for those who are young (or young-at-heart) but no longer exactly children. Between the ages of 6 and 12. These are the first chapter books, like Little House on the Prairie and The Black Stallion. These deal with issues that kids between the ages of 6-12 deal with--friends, school, family relationships, etc. There is generally no sexual content at all in these books, and the violence is usually minimal--and not developed with detail if it is there.
-Legal 	
- 	Books in which the interpretation and application of a society's laws play a major role. Includes courtroom fiction such as John Grisham's works, as well as books that focus on law enforcement officers and procedures of all sorts.
-Magical Realism 	
- 	Books written in a realistic world on earth, while incorporating magical elements as reality. Tell-tale characteristics include a non-linear approach to time (often cyclical), non-linear plots (eg. parallel plots in different layers of time overlapping), rich symbolism and imagery, incorporation of mythology and folklore, and non-realistic events happening in a realistic setting.
-Manga 	
- 	Japanese style volumised graphic novels often possessing a linear storyline that extends to several volumes. Includes works such as Inuyasha, Naruto and Love Hina.
 Martial Arts 	
  	Books in which the primary focus involves the martial arts and/or martial artists.
 Mathematics 	
  	Non-Fiction or fiction where the plot deals HEAVILY with mathematics in a central fashion.
 Mature 	
  	Books that, for reasons usually of sexual or violent content or themes requiring more experience to interpret, would usually be deemed appropriate for adults only. [But not specifically erotic]
-Medical (Fiction) 	
- 	Stories that use current or near-future medical theories and practices as a basis. May include themes such as virus outbreaks, genetic engineering, etc.
-Medical (Non-Fiction) 	
+Medical 	
  	Books that use current or past medical science or themes as a basis. May include memoirs, textbooks, reference books, real life historical accounts, past and present medical research, etc.
 Mystery 	
  	Books about the solving of a particular crime, generally a murder, or other large crime.
 Nanotechnology 	
  	Stories involving microscopic machines.
-Nature & Ecology 	
- 	Books that focus on the natural world. Includes novels in which a natural setting plays a major part, non-fiction books that analyze ecological cycles, works which focus on man's effect on the environment, and other similar topics.
-Nautical 	
- 	Stories set primarily on or around sea- and ocean-faring ships.
-Non-Fiction 	
- 	Now Why have I included a Genre of Non-Fiction in a database of Fiction? It is because there are many authors who have written a lot of Fiction and some non-fiction...
-Novelisations 	
- 	Books that are based on stories that have already been presented in other forms of media such as, but not limited to; movies, television shows, radio programs, and videogames.
 Philosophy 	
  	Works that represent attempts to understand the "greater truths" or humanity -- why are we here? what is good, and what is evil? -- through analysis rather than through speculation.
 Poetry 	
  	Books in which the primary focus is on the beauty of the written word, in all it's varied splendors
 Politics 	
  	Books in which the primary focus involves politicians, the political process in general, major political incidents, political commentary, etc.
-Post-Apocalypse 	
- 	Speculative fiction of what might happen were our world to undergo cataclysmic change, along the lines of nuclear annihlation, another ice age, etc. Often a subsection of science fiction, but not always.
-Private Investigator 	
- 	
-Psionic Powers 	
- 	Books that have as a focus extraordinary powers of the human mind such as telekinesis, telepathy, and mind control.
-Psychology & Counseling 	
- 	
-Psychometrics & Cognition 	
- 	Books in which the primary focus involves studying and/or discussing matters pertaining to human reasoning and intelligence, typically with special emphasis on testing and statistical analysis in order to identify and/or examine those who lie outside the range of what is considered "normal". Related topics may include the unique problems and experiences of such people (i.e., those who are 'challenged' or 'gifted'), from a psychological, social or behavioral standpoint.
 Religion 	
  	Books that have as a focus or strong base one or more of the world's major religions. May be non-fiction accounts and interpretations of the religion(s), or fiction that relies on an understanding of them.
 Romance 	
@@ -152,42 +82,6 @@ Science
  	Books that discuss current or past scientific advances, theories, and practices.
 Science Fiction 	
  	Fiction that relies on advanced technology and/or an expanded definition of current laws of science for its differences from regular fiction. Some people use the alternate term "Speculative Fiction" which poses fictional "what if" circumstances, and then explores {read: speculates} about the ramifications of those hypothetical circumstances. Those adhering to the latter usage sometimes consider "Science Fiction" (aka 'SciFi") to be a sub-genre of 'SpecFi' with more of a 'hard science' bent. At the present time, we use the terms interchangeably.
-Setting: Battletech 	
- 	Armored combat action fiction set in the Battletech/Mechwarrior role-playing game campaign setting, by Roc publishing.
-Setting: Buffy the Vampire Slayer 	
- 	Fiction set in the world of Buffy, or books discussing that world.
-Setting: Dark Sun - Athas 	
- 	Fiction set in the "Dark Sun" campaign setting of the D20/AD&D Role Playing Game universe
-Setting: Dr. Who 	
- 	Fiction set in the world of Dr Who, or books discussing that world.
-Setting: Dragonlance 	
- 	Books set in either the world of "Krynn" (by Margaret Weiss and Tracy Hickmann), or in the "Dragonlance" campaign setting (which is based on Krynn) of the D20/AD&D Role Playing Game universe
-Setting: Eternal Champion 	
- 	Fiction set in the worlds of Michael Moorcock's Eternal Champion, or books discussing those worlds.
-Setting: Forgotten Realms 	
- 	Books set in the Forgotten Realms campaign setting for Dungeons & Dragons.
-Setting: Greyhawk 	
- 	Fiction set in the world of Grayhawk, or books discussing this world.
-Setting: Magic, The Gathering 	
- 	Books about, or set in, the "Magic: The GatheringTM" collectible card game.
-Setting: Middle Earth 	
- 	Material set in J. R. R. Tolkien's "Middle Earth" or in the Middle Earth Role Playing Game campaign setting (aka "MERP").
-Setting: Planescape 	
- 	Fiction set in the "Planescape" multi-verse fantasy campaign setting of the D20/AD&D Role Playing Game universe
-Setting: Ravenloft 	
- 	Books set in the "Ravenloft" (vampires, werewolves & gothic horror) campaign setting of the D20/AD&D Role Playing Game universe.
-Setting: Star Trek 	
- 	Fiction set in the world of Gene Roddenberry's Star Trek, or books discussing that world.
-Setting: Star Wars 	
- 	Fiction set in the world of George Lucas' Star Wars, or books discussing that world.
-Setting: Thieves' World 	
- 	Stories and books set in Robert Lynn Asprin's fantasy world of the same name.
-Setting: Vampire The Masquerade 	
- 	Vampire-related fiction set in the "Vampire the Masquerade" role-playing game campaign setting, by White Wolf Publishing.
-Setting: Velgarth 	
- 	Stories and books set in Mercedes Lackey's fantasy world of Velgarth, including Valdemar, Karse, the Tayledras & the Shin'a'in, among other areas and races.
-Short Stories 	
- 	Books that include multiple stories (plural) of less than novel length ...
 Sport 	
  	Non-fiction books about real-world sporting events, games, and figures, or fiction in which the world of sports plays a heavy role.
 Supernatural 	
@@ -200,18 +94,12 @@ Thriller
  	Tough, resourceful, but usually ordinary 'heroes' are pitted against the baddest of the bad, who are determined to destroy them, their country, or the entire world. High stakes, non-stop action, plot twists, exotic settings, and an intense pace until the adrenaline packed climax are found throughout these books. The plot of a thriller is usually driven by the villain, who presents obstacles that the hero must overcome.
 Time Travel 	
  	Books, often science fiction, which include and focus on travel through time, be it to the past or farther into the future than the normal passage of time allows.
-Travel & Tourism 	
- 	Books which provide information on traveling to specific locales, and things to look for while you're there.
-Undead 	
- 	Stories that feature lesser forms of undead, such as Zombies or Mummies - mortals that bodily return to some incomplete stage of life or animation, either as the result of science run amok (robocop, frankenstein), a virus (resident evil), magic (mummies), or evil so great that it transcends death (revenants/liches like Freddy Kruger and Jason). A common theme in these stories is that something is missing that the undead is driven to recover - either some vital spark that was lost, a curse or some undying hatred, or perhaps cannibalistic needs. Often, but not always, a sub-genre under horror. Note that vampires are a related but seperate genre.
 Vampire 	
  	Stories which feature vampires -- blood-drinking creatures of the night, typically -- as major themes or characters. The vampire(s) in question may be heroes or villains, or both! The cause of the vampirism could be an undead or magical curse (Dracula), a virus (Underworld), or genetic mutation (Blade). Often, but not always, a sub-genre under horror.
 Virtual Reality 	
  	Books which employ a world of computers that is separate from ours, but emulate it in some way. Typically science fiction, although there may be cases where our current technology approaches virtual reality, as well.
 War 	
  	Books that discuss and analyze factual wars, or the theories behind the same, or books that focus on events and figures during fictional military engagements.
-Werewolves & Shapeshifters 	
- 	Stories which feature weres -- werewolves, typically but occasionally other breeds of were -- as major themes or characters. The were(s) in question may be heroes or villains, or both! The cause of the were could be an undead or magical curse, a virus, or genetic mutation. Often, but not always, a sub-genre under horror.
 Western 	
  	Stories set in America's "Old West," a time of cowboys, indians, frontier living, and shootouts with the sheriff or marshal.
 Young Adult 	

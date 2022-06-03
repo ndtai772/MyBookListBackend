@@ -42,6 +42,12 @@ func NewServer(store *db.Store) *Server {
 			"publisher",
 			"categories",
 		},
+		FilterableAttributes: []string{
+			"categories",
+			"author",
+			"publisher",
+		},
+		SortableAttributes: []string{},
 	})
 
 	categories, err := store.ListCategories(context.Background())

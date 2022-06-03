@@ -113,3 +113,30 @@ func (server *Server) updateBookmarkType(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, updatedBookmark)
 }
+
+func (server *Server) listPersonalBookmarks(ctx *gin.Context) {
+	id, err := parseIdUri(ctx)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	if authPayload.AccountID != id {
+		ctx.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	bookmarks, err := server.store.ListBookmarkedBooksByAccountId(ctx, id)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": bookmarks,
+	})
+}

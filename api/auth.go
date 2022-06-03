@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -25,12 +26,12 @@ func (server *Server) login(ctx *gin.Context) {
 
 	account, err := server.store.GetAccountByEmail(ctx, loginReq.Email)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		ctx.JSON(http.StatusNotFound, errorResponse(errors.New("email/password is incorrect")))
 		return
 	}
 
 	if err := util.CheckPassword(loginReq.Password, account.HashedPassword); err != nil {
-		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		ctx.JSON(http.StatusNotFound, errorResponse(errors.New("email/password is incorrect")))
 		return
 	}
 
@@ -57,7 +58,7 @@ func (server *Server) login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
-		"account": toAccountRes(account),
+		"account":       toAccountRes(account),
 	})
 }
 

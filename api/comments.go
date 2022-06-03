@@ -68,3 +68,47 @@ func (server *Server) deleteComment(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, nil)
 }
+
+func (server *Server) listPersonalComments(ctx *gin.Context) {
+	accountId, err := parseIdUri(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	if authPayload.AccountID != accountId {
+		ctx.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	page_size, last_id, err := parsePaginateQuery(ctx)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	comments, err := server.store.ListCommentsByAccountId(ctx, db.ListCommentsByAccountIdParams{
+		UserID:   accountId,
+		PageSize: page_size,
+		LastID:   last_id,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	lastID := -1
+
+	if len(comments) > 0 {
+		lastID = int(comments[len(comments)-1].ID)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"data":    comments,
+		"last_id": lastID,
+	})
+}

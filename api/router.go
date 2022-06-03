@@ -24,8 +24,9 @@ func (server *Server) setupRouter() {
 
 	// Accounts
 	publicRoutes.POST("/accounts", server.createAccount)
-	publicRoutes.GET("/accounts/:id", server.getAccount)
-	authRoutes.PATCH("/accounts/:id", unimplemented("update account"))
+	publicRoutes.GET("/accounts/:id", server.getAccountInfo)
+	authRoutes.PATCH("/accounts/:id", unimplemented("update account info"))
+	authRoutes.PATCH("/accounts/:id/password", unimplemented("update password"))
 	authRoutes.GET("/accounts/:id/bookmarks", server.listPersonalBookmarks)
 	authRoutes.GET("/accounts/:id/rates", unimplemented("list personal rates"))
 	authRoutes.GET("/accounts/:id/comments", server.listPersonalComments)

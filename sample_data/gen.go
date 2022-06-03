@@ -3,9 +3,13 @@ package sampledata
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/url"
+	"strings"
 	"sync"
 
+	"github.com/bxcodec/faker/v3"
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
 	"github.com/ndtai772/MyBookListBackend/util"
 )
@@ -13,8 +17,8 @@ import (
 var gContext context.Context = context.Background()
 
 const (
-	NUM_OF_USERS           = 20
-	NUM_OF_CATEGORIES      = 25
+	NUM_OF_USERS           = 30
+	NUM_OF_CATEGORIES      = 52
 	NUM_OF_BOOKS           = 1000
 	MAX_RATE_PER_USER      = NUM_OF_BOOKS / 4
 	MAX_BOOKMARKS_PER_USER = NUM_OF_BOOKS / 4
@@ -22,7 +26,18 @@ const (
 )
 
 func Gen(store *db.Store) {
-	// addCategory(store)
+	addCategory(store)
+
+	// add default user
+	hashedPw, _ := util.HashPassword("password")
+	params := db.CreateAccountParams{
+		Name:           "Nguyễn An",
+		AvatarUrl:      fmt.Sprintf("https://ui-avatars.com/api/?name=%s", url.QueryEscape("Nguyễn An")),
+		Email:          "user@gmail.com",
+		HashedPassword: hashedPw,
+	}
+
+	store.CreateAccount(gContext, params)
 
 	randomUsers(store)
 
@@ -49,10 +64,12 @@ func Gen(store *db.Store) {
 
 func randomUsers(store *db.Store) {
 	for i := 0; i < NUM_OF_USERS; i++ {
+		name := fmt.Sprintf("%s %s", faker.FirstName(), faker.LastName())
 		createAccountParams := db.CreateAccountParams{
-			Name:           util.RandomString(10),
-			Email:          fmt.Sprintf("%s@gmail.com", util.RandomString(10)),
+			Name:           name,
+			Email:          faker.Email(),
 			HashedPassword: util.RandomString(100),
+			AvatarUrl:      fmt.Sprintf("https://ui-avatars.com/api/?name=%s", url.QueryEscape(name)),
 		}
 		store.CreateAccount(gContext, createAccountParams)
 
@@ -62,7 +79,7 @@ func randomUsers(store *db.Store) {
 
 func randomBookCategories(store *db.Store) {
 	for bookId := 1; bookId <= NUM_OF_BOOKS; bookId++ {
-		numberOfCategories := util.RandomInt(3, 5)
+		numberOfCategories := util.RandomInt(2, 5)
 		categories := map[int64]bool{}
 
 		for {
@@ -150,7 +167,7 @@ func randomComments(store *db.Store) {
 			params := db.CreateCommentParams{
 				BookID:    int32(bookId),
 				CreatedBy: int32(util.RandomInt(1, NUM_OF_USERS)),
-				Content:   util.RandomString(100),
+				Content:   faker.Sentence(),
 			}
 
 			store.CreateComment(gContext, params)
@@ -159,28 +176,28 @@ func randomComments(store *db.Store) {
 	}
 }
 
-// func addCategory(store *db.Store) {
-// 	buff, err := ioutil.ReadFile("sample_data/categories.txt")
-// 	if err != nil {
-// 		panic("couldn't read data from file")
-// 	}
-// 	data := string(buff)
-// 	lines := strings.Split(data, "\n")
+func addCategory(store *db.Store) {
+	buff, err := ioutil.ReadFile("sample_data/categories.txt")
+	if err != nil {
+		panic("couldn't read data from file")
+	}
+	data := string(buff)
+	lines := strings.Split(data, "\n")
 
-// 	createCategoryParams := []db.CreateCategoryParams{}
+	createCategoryParams := []db.CreateCategoryParams{}
 
-// 	for i := 0; i + 1 < len(lines); i += 2 {
-// 		name := strings.TrimSpace(lines[i])
-// 		description := strings.TrimSpace(lines[i + 1])
-		
-// 		createCategoryParams = append(createCategoryParams, db.CreateCategoryParams{
-// 			Name: name,
-// 			Description: description,
-// 		})
-// 	}
-// 	for i := 0; i < len(createCategoryParams); i++ {
-// 		store.CreateCategory(gContext, createCategoryParams[i])
-// 		log.Println("created a new category")
-// 	}
+	for i := 0; i+1 < len(lines); i += 2 {
+		name := strings.TrimSpace(lines[i])
+		description := strings.TrimSpace(lines[i+1])
 
-// }
+		createCategoryParams = append(createCategoryParams, db.CreateCategoryParams{
+			Name:        name,
+			Description: description,
+		})
+	}
+	for i := 0; i < len(createCategoryParams); i++ {
+		store.CreateCategory(gContext, createCategoryParams[i])
+		log.Println("created a new category")
+	}
+
+}
