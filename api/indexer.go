@@ -21,7 +21,7 @@ type BookBrief struct {
 	CommentCount  int64    `json:"comment_count"`
 	BookmarkCount int64    `json:"bookmark_count"`
 	RateCount     int64    `json:"rate_count"`
-	RateSum       int64    `json:"rate_sum"`
+	RateAvg       float64  `json:"rate_avg"`
 	Pages         int64    `json:"pages"`
 }
 
@@ -35,17 +35,24 @@ func toBookBrief(server *Server, book db.ListBooksRow) BookBrief {
 		categories = append(categories, server.categoryIndex[id])
 	}
 
+	rateAvg := 2.5
+
+	if book.RateCount > 0 {
+		rateAvg, _ = strconv.ParseFloat(book.RateAvg, 64)
+		rateAvg = math.Round(rateAvg * 100) / 100
+	}
+
 	return BookBrief{
 		ID:            book.ID,
 		Title:         book.Title,
 		Author:        book.Author,
 		Publisher:     book.Publisher,
-		CoverUrl:      "/covers/" + book.CoverUrl,
+		CoverUrl:      book.CoverUrl,
 		Categories:    categories,
 		CommentCount:  book.CommentCount,
 		BookmarkCount: book.BookmarkCount,
 		RateCount:     book.RateCount,
-		RateSum:       book.RateSum,
+		RateAvg:       rateAvg,
 		Pages:         int64(book.Pages),
 	}
 }

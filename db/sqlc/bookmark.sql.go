@@ -92,32 +92,45 @@ func (q *Queries) GetBookmark(ctx context.Context, id int32) (Bookmark, error) {
 }
 
 const listBookmarkedBooksByAccountId = `-- name: ListBookmarkedBooksByAccountId :many
-SELECT 
-    books.id as book_id,
-    books.title,
-    books.author,
-    books.language,
-    books.publisher,
-    books.pages,
-    books.cover_url,
-    bookmarks.id as bookmark_id,
-    bookmarks.type as bookmark_type
+SELECT bd.id,
+       title,
+       author,
+       description,
+       year,
+       language,
+       publisher,
+       pages,
+       cover_url,
+       categories,
+       comment_count,
+       bookmark_count,
+       rate_count,
+       rate_avg,
+       bookmarks.id   as bookmark_id,
+       bookmarks.type as bookmark_type
 FROM bookmarks
-    JOIN books on books.id = bookmarks.book_id
+JOIN book_detail bd on bookmarks.book_id = bd.id
 WHERE bookmarks.created_by = $1
 ORDER BY bookmarks.id DESC
 `
 
 type ListBookmarkedBooksByAccountIdRow struct {
-	BookID       int32  `json:"book_id"`
-	Title        string `json:"title"`
-	Author       string `json:"author"`
-	Language     string `json:"language"`
-	Publisher    string `json:"publisher"`
-	Pages        int16  `json:"pages"`
-	CoverUrl     string `json:"cover_url"`
-	BookmarkID   int32  `json:"bookmark_id"`
-	BookmarkType int32  `json:"bookmark_type"`
+	ID            int32  `json:"id"`
+	Title         string `json:"title"`
+	Author        string `json:"author"`
+	Description   string `json:"description"`
+	Year          int16  `json:"year"`
+	Language      string `json:"language"`
+	Publisher     string `json:"publisher"`
+	Pages         int16  `json:"pages"`
+	CoverUrl      string `json:"cover_url"`
+	Categories    string `json:"categories"`
+	CommentCount  int64  `json:"comment_count"`
+	BookmarkCount int64  `json:"bookmark_count"`
+	RateCount     int64  `json:"rate_count"`
+	RateAvg       string `json:"rate_avg"`
+	BookmarkID    int32  `json:"bookmark_id"`
+	BookmarkType  int32  `json:"bookmark_type"`
 }
 
 func (q *Queries) ListBookmarkedBooksByAccountId(ctx context.Context, createdBy int32) ([]ListBookmarkedBooksByAccountIdRow, error) {
@@ -130,13 +143,20 @@ func (q *Queries) ListBookmarkedBooksByAccountId(ctx context.Context, createdBy 
 	for rows.Next() {
 		var i ListBookmarkedBooksByAccountIdRow
 		if err := rows.Scan(
-			&i.BookID,
+			&i.ID,
 			&i.Title,
 			&i.Author,
+			&i.Description,
+			&i.Year,
 			&i.Language,
 			&i.Publisher,
 			&i.Pages,
 			&i.CoverUrl,
+			&i.Categories,
+			&i.CommentCount,
+			&i.BookmarkCount,
+			&i.RateCount,
+			&i.RateAvg,
 			&i.BookmarkID,
 			&i.BookmarkType,
 		); err != nil {

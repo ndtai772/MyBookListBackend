@@ -28,17 +28,23 @@ DELETE FROM bookmarks
 WHERE id = $1;
 
 -- name: ListBookmarkedBooksByAccountId :many
-SELECT 
-    books.id as book_id,
-    books.title,
-    books.author,
-    books.language,
-    books.publisher,
-    books.pages,
-    books.cover_url,
-    bookmarks.id as bookmark_id,
-    bookmarks.type as bookmark_type
+SELECT bd.id,
+       title,
+       author,
+       description,
+       year,
+       language,
+       publisher,
+       pages,
+       cover_url,
+       categories,
+       comment_count,
+       bookmark_count,
+       rate_count,
+       rate_avg,
+       bookmarks.id   as bookmark_id,
+       bookmarks.type as bookmark_type
 FROM bookmarks
-    JOIN books on books.id = bookmarks.book_id
+JOIN book_detail bd on bookmarks.book_id = bd.id
 WHERE bookmarks.created_by = $1
 ORDER BY bookmarks.id DESC;

@@ -13,6 +13,12 @@ FROM rates
 WHERE id = $1
 LIMIT 1;
 
+-- name: CheckRate :one
+SELECT *
+FROM rates
+WHERE book_id = $1 AND created_by = $2
+LIMIT 1;
+
 -- name: UpdateRate :one
 UPDATE rates
 SET rate_value = $2

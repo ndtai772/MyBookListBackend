@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	CheckBookmark(ctx context.Context, arg CheckBookmarkParams) (Bookmark, error)
+	CheckRate(ctx context.Context, arg CheckRateParams) (Rate, error)
 	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
 	CreateBook(ctx context.Context, arg CreateBookParams) (Book, error)
 	CreateBookCategory(ctx context.Context, arg CreateBookCategoryParams) (BookCategory, error)

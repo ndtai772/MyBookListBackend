@@ -66,6 +66,8 @@ func (server *Server) deleteComment(ctx *gin.Context) {
 		return
 	}
 
+	server.updateBookIndex(comment.BookID)
+
 	ctx.JSON(http.StatusOK, nil)
 }
 

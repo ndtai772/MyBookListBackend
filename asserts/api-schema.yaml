@@ -81,7 +81,7 @@ components:
         title: { type: string }
         author: { type: string }
         description: { type: string }
-        rate_sum: { type: integer }
+        rate_avg: { type: integer }
         rate_count: { type: integer }
         comment_count: { type: integer }
         categories:

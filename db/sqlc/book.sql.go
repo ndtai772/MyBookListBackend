@@ -60,7 +60,7 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 }
 
 const getBook = `-- name: GetBook :one
-SELECT id, title, author, description, year, language, publisher, pages, cover_url, created_at, categories, comment_count, bookmark_count, rate_count, rate_sum, rate_1, rate_2, rate_3, rate_4, rate_5, rate_6, rate_7, rate_8, rate_9, rate_10
+SELECT id, title, author, description, year, language, publisher, pages, cover_url, created_at, categories, comment_count, bookmark_count, rate_count, rate_avg
 FROM book_detail
 WHERE id = $1 LIMIT 1
 `
@@ -83,23 +83,13 @@ func (q *Queries) GetBook(ctx context.Context, id int32) (BookDetail, error) {
 		&i.CommentCount,
 		&i.BookmarkCount,
 		&i.RateCount,
-		&i.RateSum,
-		&i.Rate1,
-		&i.Rate2,
-		&i.Rate3,
-		&i.Rate4,
-		&i.Rate5,
-		&i.Rate6,
-		&i.Rate7,
-		&i.Rate8,
-		&i.Rate9,
-		&i.Rate10,
+		&i.RateAvg,
 	)
 	return i, err
 }
 
 const getBookBrief = `-- name: GetBookBrief :one
-SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum, pages
+SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_avg, pages
 FROM book_detail
 WHERE id = $1 LIMIT 1
 `
@@ -114,7 +104,7 @@ type GetBookBriefRow struct {
 	CommentCount  int64  `json:"comment_count"`
 	BookmarkCount int64  `json:"bookmark_count"`
 	RateCount     int64  `json:"rate_count"`
-	RateSum       int64  `json:"rate_sum"`
+	RateAvg       string `json:"rate_avg"`
 	Pages         int16  `json:"pages"`
 }
 
@@ -131,14 +121,14 @@ func (q *Queries) GetBookBrief(ctx context.Context, id int32) (GetBookBriefRow, 
 		&i.CommentCount,
 		&i.BookmarkCount,
 		&i.RateCount,
-		&i.RateSum,
+		&i.RateAvg,
 		&i.Pages,
 	)
 	return i, err
 }
 
 const listBooks = `-- name: ListBooks :many
-SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_sum, pages
+SELECT id, title, author, publisher, cover_url, categories, comment_count, bookmark_count, rate_count, rate_avg, pages
 FROM book_detail
 WHERE NOT id > $2
 ORDER BY id DESC
@@ -160,7 +150,7 @@ type ListBooksRow struct {
 	CommentCount  int64  `json:"comment_count"`
 	BookmarkCount int64  `json:"bookmark_count"`
 	RateCount     int64  `json:"rate_count"`
-	RateSum       int64  `json:"rate_sum"`
+	RateAvg       string `json:"rate_avg"`
 	Pages         int16  `json:"pages"`
 }
 
@@ -183,7 +173,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBoo
 			&i.CommentCount,
 			&i.BookmarkCount,
 			&i.RateCount,
-			&i.RateSum,
+			&i.RateAvg,
 			&i.Pages,
 		); err != nil {
 			return nil, err

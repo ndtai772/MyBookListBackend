@@ -9,6 +9,31 @@ import (
 	"context"
 )
 
+const checkRate = `-- name: CheckRate :one
+SELECT id, book_id, created_by, rate_value, created_at
+FROM rates
+WHERE book_id = $1 AND created_by = $2
+LIMIT 1
+`
+
+type CheckRateParams struct {
+	BookID    int32 `json:"book_id"`
+	CreatedBy int32 `json:"created_by"`
+}
+
+func (q *Queries) CheckRate(ctx context.Context, arg CheckRateParams) (Rate, error) {
+	row := q.db.QueryRowContext(ctx, checkRate, arg.BookID, arg.CreatedBy)
+	var i Rate
+	err := row.Scan(
+		&i.ID,
+		&i.BookID,
+		&i.CreatedBy,
+		&i.RateValue,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const createRate = `-- name: CreateRate :one
 INSERT INTO rates (
     book_id,

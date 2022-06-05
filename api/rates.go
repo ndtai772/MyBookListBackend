@@ -1,8 +1,10 @@
 package api
 
 import (
+	"errors"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -31,7 +33,6 @@ func (server *Server) createRate(ctx *gin.Context) {
 		RateValue: createRateForm.Score,
 	}
 
-
 	rate, err := server.store.CreateRate(ctx, createRateParams)
 
 	if err != nil {
@@ -45,15 +46,28 @@ func (server *Server) createRate(ctx *gin.Context) {
 }
 
 func (server *Server) updateRate(ctx *gin.Context) {
-	// TODO: verify ownership of the rate
 	rateId, err := parseIdUri(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
+	rate, err := server.store.GetRate(ctx, rateId)
+
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	if rate.CreatedBy != authPayload.AccountID {
+		ctx.JSON(http.StatusForbidden, errorResponse(errors.New("you don't own this rate")))
+		return
+	}
+
 	var updateRateForm struct {
-		score int32 `form:"score" binding:"required"`
+		Score int32 `form:"score" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindWith(&updateRateForm, binding.Form); err != nil {
@@ -61,8 +75,8 @@ func (server *Server) updateRate(ctx *gin.Context) {
 		return
 	}
 
-	rate, err := server.store.UpdateRate(ctx, db.UpdateRateParams{
-		RateValue: updateRateForm.score,
+	rate, err = server.store.UpdateRate(ctx, db.UpdateRateParams{
+		RateValue: updateRateForm.Score,
 		ID:        rateId,
 	})
 
@@ -72,6 +86,41 @@ func (server *Server) updateRate(ctx *gin.Context) {
 	}
 
 	server.updateBookIndex(rate.BookID)
+
+	ctx.JSON(http.StatusOK, rate)
+}
+
+func (server *Server) checkRate(ctx *gin.Context) {
+	var req struct {
+		AccountID int `form:"account_id" binding:"required"`
+		BookID    int `form:"book_id" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindWith(&req, binding.Query); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	if authPayload.AccountID != int32(req.AccountID) {
+		ctx.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	rate, err := server.store.CheckRate(ctx, db.CheckRateParams{
+		BookID:    int32(req.BookID),
+		CreatedBy: int32(req.AccountID),
+	})
+
+	if err != nil {
+		if strings.HasPrefix(err.Error(), "sql: no rows in result set") {
+			ctx.JSON(http.StatusNotFound, errorResponse(errors.New("you didn't rate this book before")))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
 	ctx.JSON(http.StatusOK, rate)
 }

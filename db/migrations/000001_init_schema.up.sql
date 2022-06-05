@@ -82,6 +82,10 @@ CREATE INDEX ON "bookmarks" ("book_id");
 
 CREATE UNIQUE INDEX ON "bookmarks" ("book_id", "created_by");
 
+CREATE INDEX ON "rates" ("book_id");
+
+CREATE UNIQUE INDEX ON "rates" ("book_id", "created_by");
+
 CREATE INDEX ON "comments" ("book_id");
 
 CREATE INDEX ON "comments" ("created_by");

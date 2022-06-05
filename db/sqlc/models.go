@@ -52,17 +52,7 @@ type BookDetail struct {
 	CommentCount  int64     `json:"comment_count"`
 	BookmarkCount int64     `json:"bookmark_count"`
 	RateCount     int64     `json:"rate_count"`
-	RateSum       int64     `json:"rate_sum"`
-	Rate1         int64     `json:"rate_1"`
-	Rate2         int64     `json:"rate_2"`
-	Rate3         int64     `json:"rate_3"`
-	Rate4         int64     `json:"rate_4"`
-	Rate5         int64     `json:"rate_5"`
-	Rate6         int64     `json:"rate_6"`
-	Rate7         int64     `json:"rate_7"`
-	Rate8         int64     `json:"rate_8"`
-	Rate9         int64     `json:"rate_9"`
-	Rate10        int64     `json:"rate_10"`
+	RateAvg       string    `json:"rate_avg"`
 }
 
 type Bookmark struct {
@@ -112,17 +102,7 @@ type Rate struct {
 }
 
 type RateCount struct {
-	BookID  int32 `json:"book_id"`
-	Count   int64 `json:"count"`
-	RateSum int64 `json:"rate_sum"`
-	Rate1   int64 `json:"rate_1"`
-	Rate2   int64 `json:"rate_2"`
-	Rate3   int64 `json:"rate_3"`
-	Rate4   int64 `json:"rate_4"`
-	Rate5   int64 `json:"rate_5"`
-	Rate6   int64 `json:"rate_6"`
-	Rate7   int64 `json:"rate_7"`
-	Rate8   int64 `json:"rate_8"`
-	Rate9   int64 `json:"rate_9"`
-	Rate10  int64 `json:"rate_10"`
+	BookID  int32  `json:"book_id"`
+	Count   int64  `json:"count"`
+	RateAvg string `json:"rate_avg"`
 }
