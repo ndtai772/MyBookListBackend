@@ -91,3 +91,57 @@ func (q *Queries) GetAccountByEmail(ctx context.Context, email string) (Account,
 	)
 	return i, err
 }
+
+const updateAccountInfo = `-- name: UpdateAccountInfo :one
+UPDATE accounts
+SET name = $2
+WHERE id = $1
+RETURNING id, name, email, hashed_password, avatar_url, is_admin, created_at
+`
+
+type UpdateAccountInfoParams struct {
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) UpdateAccountInfo(ctx context.Context, arg UpdateAccountInfoParams) (Account, error) {
+	row := q.db.QueryRowContext(ctx, updateAccountInfo, arg.ID, arg.Name)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.HashedPassword,
+		&i.AvatarUrl,
+		&i.IsAdmin,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateAccountPassword = `-- name: UpdateAccountPassword :one
+UPDATE accounts
+SET hashed_password = $2
+WHERE id = $1
+RETURNING id, name, email, hashed_password, avatar_url, is_admin, created_at
+`
+
+type UpdateAccountPasswordParams struct {
+	ID             int32  `json:"id"`
+	HashedPassword string `json:"hashed_password"`
+}
+
+func (q *Queries) UpdateAccountPassword(ctx context.Context, arg UpdateAccountPasswordParams) (Account, error) {
+	row := q.db.QueryRowContext(ctx, updateAccountPassword, arg.ID, arg.HashedPassword)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.HashedPassword,
+		&i.AvatarUrl,
+		&i.IsAdmin,
+		&i.CreatedAt,
+	)
+	return i, err
+}

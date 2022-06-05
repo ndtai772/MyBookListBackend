@@ -87,6 +87,71 @@ func (server *Server) getAccountInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, toAccountRes(account))
 }
 
+func (server *Server) updateAccountInfo(ctx *gin.Context) {
+	id, err := parseIdUri(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	var reqForm struct {
+		Name string `form:"name" binding:"required"`
+	}
+	if err := ctx.ShouldBindWith(&reqForm, binding.Form); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateAccountInfoParams{
+		ID:   id,
+		Name: reqForm.Name,
+	}
+
+	account, err := server.store.UpdateAccountInfo(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, toAccountRes(account))
+}
+
+func (server *Server) updateAccountPassword(ctx *gin.Context) {
+	id, err := parseIdUri(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	var reqForm struct {
+		Password string `form:"password" binding:"required"`
+	}
+	if err := ctx.ShouldBindWith(&reqForm, binding.Form); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	hashedPw, err := util.HashPassword(reqForm.Password)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+
+	arg := db.UpdateAccountPasswordParams{
+		ID:   id,
+		HashedPassword: hashedPw,
+	}
+
+	account, err := server.store.UpdateAccountPassword(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, toAccountRes(account))
+}
 
 // func (server *Server) listPersonalRates(ctx *gin.Context) {
 // 	id, err := parseIdUri(ctx)

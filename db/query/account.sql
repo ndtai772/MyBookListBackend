@@ -19,8 +19,16 @@ SELECT *
 FROM accounts
 WHERE email = $1 LIMIT 1;
 
--- -- name: UpdateAccount :one
--- UPDATE accounts
--- SET encoded_hash = $2
--- WHERE id = $1
--- RETURNING *;
+-- name: UpdateAccountPassword :one
+UPDATE accounts
+SET hashed_password = $2
+WHERE id = $1
+RETURNING *;
+
+-- name: UpdateAccountInfo :one
+UPDATE accounts
+SET name = $2
+WHERE id = $1
+RETURNING *;
+
+

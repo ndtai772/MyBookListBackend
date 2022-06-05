@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/meilisearch/meilisearch-go"
 	db "github.com/ndtai772/MyBookListBackend/db/sqlc"
 )
 
@@ -50,34 +51,30 @@ func (server *Server) listBooksByCategory(ctx *gin.Context) {
 		return
 	}
 
-	page_size, last_id, err := parsePaginateQuery(ctx)
+	var req struct {
+		Limit  int `form:"limit" binding:"required"`
+		Offset int `form:"offset"`
+	}
 
-	if err != nil {
+	if err := ctx.ShouldBindWith(&req, binding.Query); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	listParams := db.ListBooksByCategoryIdParams{
-		Limit:      page_size,
-		LastID:     last_id,
-		CategoryID: id,
-	}
-
-	books, err := server.store.ListBooksByCategoryId(ctx, listParams)
+	books, err := server.bookIndex.Search("", &meilisearch.SearchRequest{
+		Limit:  int64(req.Limit),
+		Offset: int64(req.Offset),
+		Filter: "categories = \"" + server.categoryIndex[int(id)] + "\"",
+	})
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	lastId := -1
-	if len(books) > 0 {
-		lastId = int(books[len(books)-1].ID)
-	}
-
 	ctx.JSON(http.StatusOK, gin.H{
-		"data":      books,
-		"page_size": page_size,
-		"last_id":   lastId,
+		"data":   books.Hits,
+		"offset": books.Offset,
+		"limit":  books.Limit,
 	})
 }

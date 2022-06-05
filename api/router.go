@@ -10,6 +10,7 @@ import (
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+	router.MaxMultipartMemory = 16 << 20
 
 	publicRoutes := router.Group("/")
 	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
@@ -25,8 +26,8 @@ func (server *Server) setupRouter() {
 	// Accounts
 	publicRoutes.POST("/accounts", server.createAccount)
 	publicRoutes.GET("/accounts/:id", server.getAccountInfo)
-	authRoutes.PATCH("/accounts/:id", unimplemented("update account info"))
-	authRoutes.PATCH("/accounts/:id/password", unimplemented("update password"))
+	authRoutes.PATCH("/accounts/:id", server.updateAccountInfo)
+	authRoutes.PATCH("/accounts/:id/password", server.updateAccountPassword)
 	authRoutes.GET("/accounts/:id/bookmarks", server.listPersonalBookmarks)
 	authRoutes.GET("/accounts/:id/rates", unimplemented("list personal rates"))
 	authRoutes.GET("/accounts/:id/comments", server.listPersonalComments)

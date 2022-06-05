@@ -41,7 +41,10 @@ INSERT INTO rates (
     rate_value
 ) VALUES (
     $1, $2, $3
-) RETURNING id, book_id, created_by, rate_value, created_at
+)
+ON CONFLICT (book_id, created_by)
+DO UPDATE SET rate_value = $3
+RETURNING id, book_id, created_by, rate_value, created_at
 `
 
 type CreateRateParams struct {
